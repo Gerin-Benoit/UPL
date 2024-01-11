@@ -11,7 +11,7 @@ from .datasetbase import UPLDatasetBase
 @DATASET_REGISTRY.register()
 class DescribableTextures(DatasetBase):
 
-    dataset_dir = "dtd"
+    dataset_dir = "DTD"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -78,7 +78,7 @@ class DescribableTextures(DatasetBase):
 @DATASET_REGISTRY.register()
 class SSDescribableTextures(UPLDatasetBase):
     
-    dataset_dir = "dtd"
+    dataset_dir = "DTD"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))

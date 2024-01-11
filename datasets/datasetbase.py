@@ -118,7 +118,7 @@ class UPLDatasetBase(DatasetBase):
 
         print(f"Reading split from {filepath}")
         split = read_json(filepath)
-        train = _convert(split["train"])
+        train = _convert(split["test"])  # train->test to force training on test set
         val = _convert(split["val"])
         test = _convert(split["test"])
         return train, val, test
@@ -146,9 +146,9 @@ class UPLDatasetBase(DatasetBase):
         print(f"Reading split from {filepath}")
         split = read_json(filepath)
         if predict_label_dict is not None:
-            train = _convert(split["train"])
+            train = _convert(split["test"])   # train->test to force training on test set
         else:
-            train = _convert_no_label(split["train"])
+            train = _convert_no_label(split["test"])  # train->test to force training on test set
         return train
     
     # dtd会报错 需要单独处理，它里面有处理的函数，需要copy过来，详见原版的database

@@ -20,7 +20,7 @@ NEW_CNAMES = {
 @DATASET_REGISTRY.register()
 class Caltech101(DatasetBase):
 
-    dataset_dir = "caltech-101"
+    dataset_dir = "Caltech101"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -43,7 +43,7 @@ class Caltech101(DatasetBase):
 @DATASET_REGISTRY.register()
 class OpensetCaltech101(UPLDatasetBase):
 
-    dataset_dir = 'caltech-101'
+    dataset_dir = 'Caltech101'
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -112,7 +112,7 @@ class OpensetCaltech101(UPLDatasetBase):
 
 @DATASET_REGISTRY.register()
 class SSCaltech101(UPLDatasetBase):
-    dataset_dir = 'caltech-101'
+    dataset_dir = 'Caltech101'
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
         self.dataset_dir = os.path.join(root, self.dataset_dir)
