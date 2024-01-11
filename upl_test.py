@@ -147,7 +147,7 @@ def main(args):
         results_dict = {}
         for SHOTS in [16]:
             print('SHOTS:', SHOTS, '\n\n\n\n\n')     
-            for seed in range(1, 17):
+            for seed in range(1, 4):
                 try:
                     prob = torch.load('./analysis_results_test/{}/50_{}_{}_random_initend/test_logits.pt'.format(cfg.DATASET.NAME, seed, SHOTS))
                     prob_end.append(prob)
