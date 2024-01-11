@@ -12,7 +12,7 @@ from .datasetbase import UPLDatasetBase
 @DATASET_REGISTRY.register()
 class OxfordPets(DatasetBase):
 
-    dataset_dir = "oxford_pets"
+    dataset_dir = "OxfordPets"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -122,7 +122,7 @@ class OxfordPets(DatasetBase):
 
 @DATASET_REGISTRY.register()
 class SSOxfordPets(UPLDatasetBase):
-    dataset_dir = "oxford_pets"
+    dataset_dir = "OxfordPets"
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
         self.dataset_dir = os.path.join(root, self.dataset_dir)

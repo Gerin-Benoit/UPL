@@ -10,7 +10,7 @@ from .datasetbase import UPLDatasetBase
 @DATASET_REGISTRY.register()
 class UCF101(DatasetBase):
 
-    dataset_dir = "ucf101"
+    dataset_dir = "UCF101"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -66,7 +66,7 @@ class UCF101(DatasetBase):
 @DATASET_REGISTRY.register()
 class SSUCF101(UPLDatasetBase):
 
-    dataset_dir = "ucf101"
+    dataset_dir = "UCF101"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))

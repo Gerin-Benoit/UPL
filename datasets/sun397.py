@@ -9,7 +9,7 @@ from .datasetbase import UPLDatasetBase
 @DATASET_REGISTRY.register()
 class SUN397(DatasetBase):
 
-    dataset_dir = "sun397"
+    dataset_dir = "SUN397"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
@@ -64,7 +64,7 @@ class SUN397(DatasetBase):
 @DATASET_REGISTRY.register()
 class SSSUN397(UPLDatasetBase):
 
-    dataset_dir = "sun397"
+    dataset_dir = "SUN397"
 
     def __init__(self, cfg):
         root = os.path.abspath(os.path.expanduser(cfg.DATASET.ROOT))
