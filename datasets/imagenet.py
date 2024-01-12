@@ -41,7 +41,7 @@ class SSImageNet(UPLDatasetBase):
         num_shots = cfg.DATASET.NUM_SHOTS
         train = self.generate_fewshot_dataset(train, num_shots=-1)
 
-        sstrain = self.read_sstrain_data(train)
+        sstrain = self.read_sstrain_data(test)
         super().__init__(train_x=train, test=test, sstrain=sstrain)
 
     @staticmethod
