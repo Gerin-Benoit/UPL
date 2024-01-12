@@ -285,12 +285,14 @@ class CustomCLIP(nn.Module):
 
 
 @TRAINER_REGISTRY.register()
-class UPLTrainer(TrainerX):
+class CoOpUPLTrainer(TrainerX):
     def __init__(self, cfg):
         super().__init__(cfg)
+        self.lambda_s = cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S
+        self.lambda_q = cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q
 
     def check_cfg(self, cfg):
-        assert cfg.TRAINER.UPLTrainer.PREC in ["fp16", "fp32", "amp"]
+        assert cfg.TRAINER.CoOpUPLTrainer.PREC in ["fp16", "fp32", "amp"]
 
     def build_model(self):
         cfg = self.cfg
@@ -299,7 +301,7 @@ class UPLTrainer(TrainerX):
         print(f"Loading CLIP (backbone: {cfg.MODEL.BACKBONE.NAME})")
         clip_model = load_clip_to_cpu(cfg)
         
-        if cfg.TRAINER.UPLTrainer.PREC == "fp32" or cfg.TRAINER.UPLTrainer.PREC == "amp":
+        if cfg.TRAINER.CoOpUPLTrainer.PREC == "fp32" or cfg.TRAINER.CoOpUPLTrainer.PREC == "amp":
             # CLIP's default precision is fp16
             clip_model.float()
 
@@ -320,7 +322,7 @@ class UPLTrainer(TrainerX):
         self.sched = build_lr_scheduler(self.optim, cfg.OPTIM)
         self.register_model("prompt_learner", self.model.prompt_learner, self.optim, self.sched)
 
-        self.scaler = GradScaler() if cfg.TRAINER.UPLTrainer.PREC == "amp" else None
+        self.scaler = GradScaler() if cfg.TRAINER.CoOpUPLTrainer.PREC == "amp" else None
 
         # Note that multi-gpu training could be slow because CLIP's size is
         # big, which slows down the copy operation in DataParallel
@@ -330,13 +332,15 @@ class UPLTrainer(TrainerX):
             self.model = nn.DataParallel(self.model)
 
     def forward_backward(self, batch):
-        image, label = self.parse_batch_train(batch)
-        prec = self.cfg.TRAINER.UPLTrainer.PREC
+        image, label, label_type = self.parse_batch_train(batch)
+        prec = self.cfg.TRAINER.CoOpUPLTrainer.PREC
         if prec == "amp":
             with autocast():
                 output, image_features, text_features = self.model(image)
                 # loss = F.cross_entropy(output, label, self.class_weights)
-                loss = F.cross_entropy(output, label)
+                loss_s = F.cross_entropy(output[label_type == 's'], label[label_type == 's'])
+                loss_q = F.cross_entropy(output[label_type == 'q'], label[label_type == 'q'])
+                loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.optim.zero_grad()
             self.scaler.scale(loss).backward()
             self.scaler.step(self.optim)
@@ -344,11 +348,15 @@ class UPLTrainer(TrainerX):
         else:
             output, image_features, text_features = self.model(image)
             # loss = F.cross_entropy(output, label, self.class_weights)
-            loss = F.cross_entropy(output, label)
+            loss_s = F.cross_entropy(output[label_type == 's'], label[label_type == 's'])
+            loss_q = F.cross_entropy(output[label_type == 'q'], label[label_type == 'q'])
+            loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.model_backward_and_update(loss)
 
         loss_summary = {
             "loss": loss.item(),
+            "loss_s": loss_s.item(),
+            "loss_q": loss_q.item(),
             "acc": compute_accuracy(output, label)[0].item(),
         }
 
@@ -360,9 +368,11 @@ class UPLTrainer(TrainerX):
     def parse_batch_train(self, batch):
         input = batch["img"]
         label = batch["label"]
+        label_type = batch["label_type"]
         input = input.to(self.device)
         label = label.to(self.device)
-        return input, label
+        label_type = label_type.to(self.device)
+        return input, label, label_type
 
     def load_model(self, directory, epoch=None):
         if not directory:
@@ -447,7 +457,7 @@ class UPLTrainer(TrainerX):
         self.evaluator.reset()
 
         save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS)+'_random_init'+str(self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
+        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS)+'_random_init'+str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
@@ -548,8 +558,8 @@ class UPLTrainer(TrainerX):
         print('image_features', image_features.shape)
         print('text_features', text_features.shape)
         predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1, image_features, True)
-        save_outputs(self.train_loader_sstrain, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)  # train_loader_x -> train_loader_sstrain
-        caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_sstrain, trainer=self)
+        save_outputs(self.train_loader_x, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)
+        caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_x, trainer=self)
         return predict_label_dict
 
 
@@ -850,19 +860,23 @@ class UPLTrainer(TrainerX):
     def parse_batch_test(self, batch):
         input = batch["img"]
         label = batch["label"]
+        #label_type = batch["label_type"]
 
         input = input.to(self.device)
         label = label.to(self.device)
+        #label_type = label_type.to(self.device)
 
         return input, label
     
     def parse_batch_test_with_impath(self, batch):
         input = batch["img"]
         label = batch["label"]
+        #label_type = batch["label_type"]
         impath = batch["impath"]
 
         input = input.to(self.device)
         label = label.to(self.device)
+        #label_type = label_type.to(self.device)
         # impath = impath.to(self.device)
 
         return input, label, impath

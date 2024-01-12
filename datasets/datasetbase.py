@@ -118,7 +118,7 @@ class UPLDatasetBase(DatasetBase):
 
         print(f"Reading split from {filepath}")
         split = read_json(filepath)
-        train = _convert(split["test"])  # train->test to force training on test set
+        train = _convert(split["train"])
         val = _convert(split["val"])
         test = _convert(split["test"])
         return train, val, test
