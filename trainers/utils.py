@@ -247,8 +247,10 @@ def caculate_noise_rate(predict_label_dict, train_loader, trainer, sample_level=
     for batch_idx, batch in enumerate(train_loader):
         input, label, impath = trainer.parse_batch_test_with_impath(batch)
         for l, ip in zip(label, impath):
-            if '/data/' in ip:
+            try:
                 ip = './data/' + ip.split('/data/')[1]
+            except:
+                ip = './data/' + ip.split('/datasets/')[1]
             gt_label_dict[ip] = l
     
     # print('gt_label_dict', len(gt_label_dict))
@@ -269,7 +271,10 @@ def caculate_noise_rate_analyze(predict_label_dict, train_loader, trainer, sampl
     for batch_idx, batch in enumerate(train_loader):
         input, label, impath = trainer.parse_batch_test_with_impath(batch)
         for l, ip in zip(label, impath):
-            ip = './data/' + ip.split('/data/')[1]
+            try:
+                ip = './data/' + ip.split('/data/')[1]
+            except:
+                ip = './data/' + ip.split('/datasets/')[1]
             gt_label_dict[ip] = l
     total = 0
     correct = 0
@@ -291,7 +296,10 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
         for l, ip in zip(label, impath):
             l = l.item()
             print(ip)
-            ip = './data/' + ip.split('/data/')[1]
+            try :
+                ip = './data/' + ip.split('/data/')[1]
+            except:
+                ip = './data/' + ip.split('/datasets/')[1]
             if l not in gt_pred_label_dict:
                 gt_pred_label_dict[l] = []
                 pred_label = predict_label_dict[ip][0]
