@@ -529,7 +529,8 @@ class UPLTrainer(TrainerX):
         image_features_list = []
         img_paths = []
         from tqdm import tqdm
-        for batch_idx, batch in tqdm(enumerate(data_loader)):
+        print(f'COMPUTE FEATURES FOR {len(data_loader)} images')
+        for batch_idx, batch in enumerate(tqdm(data_loader, desc="Processing", unit="batch")):
             input, label, impath = self.parse_batch_test_with_impath(batch)
             if trainer_list is None or len(trainer_list)==1:
                 # 如果不是ensemble的测试

@@ -285,7 +285,7 @@ def caculate_noise_rate_analyze(predict_label_dict, train_loader, trainer, sampl
 def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_features, backbone_name=None):
     backbone_name = backbone_name.replace('/', '-')
     gt_pred_label_dict = {}
-    print(f'COMPUTE FEATURES FOR {train_loader} images')
+
     for batch_idx, batch in enumerate(train_loader):
         input, label, impath = trainer.parse_batch_test_with_impath(batch)
         for l, ip in zip(label, impath):
