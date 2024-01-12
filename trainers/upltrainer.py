@@ -542,6 +542,7 @@ class UPLTrainer(TrainerX):
             outputs.append(output)
             image_features_list.append(image_features)
             img_paths.append(impath)
+            break
         sstrain_outputs = torch.cat(outputs, dim=0)
         sstrain_img_paths = np.concatenate(img_paths, axis=0)
         image_features = torch.cat(image_features_list, axis=0)

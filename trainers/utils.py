@@ -290,6 +290,7 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
         input, label, impath = trainer.parse_batch_test_with_impath(batch)
         for l, ip in zip(label, impath):
             l = l.item()
+            print(ip)
             ip = './data/' + ip.split('/data/')[1]
             if l not in gt_pred_label_dict:
                 gt_pred_label_dict[l] = []
