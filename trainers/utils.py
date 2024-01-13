@@ -295,7 +295,6 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
         input, label, impath = trainer.parse_batch_test_with_impath(batch)
         for l, ip in zip(label, impath):
             l = l.item()
-            print(ip)
             try :
                 ip = './data/' + ip.split('/data/')[1]
             except:
@@ -309,16 +308,11 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
                 logits = predict_label_dict[ip][3]
                 gt_pred_label_dict[l].append([ip, pred_label, pred_v_feature, conf, logits])
             else:
-                print('2-----')
-                print(ip)
-                print('---')
-                print(predict_label_dict.keys())
                 pred_label = predict_label_dict[ip][0]
                 pred_v_feature = predict_label_dict[ip][1]
                 conf = predict_label_dict[ip][2]
                 logits = predict_label_dict[ip][3]
                 gt_pred_label_dict[l].append([ip, pred_label, pred_v_feature, conf, logits])
-            break
     
     idx = 0
     v_distance_dict = {}
