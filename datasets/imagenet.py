@@ -85,7 +85,7 @@ class SSImageNet(UPLDatasetBase):
                 try:
                     sub_impath = './data/' + item.impath.split('/data/')[1]
                 except:
-                    pass
+                    sub_impath = item.impath
                 if sub_impath in predict_label_dict:
                     new_item = Datum(impath=item.impath, label=predict_label_dict[sub_impath], classname=self._lab2cname[predict_label_dict[sub_impath]])
                     items.append(new_item)
