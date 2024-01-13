@@ -302,10 +302,6 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
                 pass # ip = './data/' + ip.split('/datasets/')[1]
             if l not in gt_pred_label_dict:
                 gt_pred_label_dict[l] = []
-                print('1-----')
-                print(ip)
-                print('---')
-                print(predict_label_dict.keys())
                 pred_label = predict_label_dict[ip][0]
                 pred_v_feature = predict_label_dict[ip][1]
 
