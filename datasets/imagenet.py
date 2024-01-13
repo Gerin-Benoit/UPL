@@ -93,8 +93,6 @@ class SSImageNet(UPLDatasetBase):
         return items
     
 
-    
-
 @DATASET_REGISTRY.register()
 class ImageNet(DatasetBase):
 
