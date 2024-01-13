@@ -65,6 +65,10 @@ CUSTOM_TEMPLATES = {
     "SSCaltech101": "a photo of a {}.",
     "SSUCF101": "a photo of a person doing {}.",
     "SSImageNet": "a photo of a {}.",
+    "SSImageNetSketch": "a photo of a {}.",
+    "SSImageNetV2": "a photo of a {}.",
+    "SSImageNetA": "a photo of a {}.",
+    "SSImageNetR": "a photo of a {}.",
 }
 
 
