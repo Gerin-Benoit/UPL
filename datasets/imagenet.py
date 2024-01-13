@@ -82,7 +82,10 @@ class SSImageNet(UPLDatasetBase):
                 self.img_dir.append(item.impath)
         else:
             for item in tqdm(train):
-                sub_impath = './data/' + item.impath.split('/data/')[1]
+                try:
+                    sub_impath = './data/' + item.impath.split('/data/')[1]
+                except:
+                    pass
                 if sub_impath in predict_label_dict:
                     new_item = Datum(impath=item.impath, label=predict_label_dict[sub_impath], classname=self._lab2cname[predict_label_dict[sub_impath]])
                     items.append(new_item)
