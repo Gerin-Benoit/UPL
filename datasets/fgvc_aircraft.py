@@ -71,7 +71,7 @@ class SSFGVCAircraft(UPLDatasetBase):
         val = self.read_data(cname2lab, "images_variant_val.txt")
         test = self.read_data(cname2lab, "images_variant_test.txt")
 
-        sstrain = self.read_data_without_label(cname2lab, "images_variant_train.txt")
+        sstrain = self.read_data_without_label(cname2lab, "images_variant_test.txt")
         num_shots = cfg.DATASET.NUM_SHOTS
         train = self.generate_fewshot_dataset(train, num_shots=-1)
         val = self.generate_fewshot_dataset(val, num_shots=-1)  
