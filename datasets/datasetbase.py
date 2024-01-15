@@ -165,7 +165,7 @@ class UPLDatasetBase(DatasetBase):
         # print(predict_label_dict, 'predict_label_dict')
         print(dataset_name)
         if dataset_name == 'SSFGVCAircraft':
-            sstrain = self.read_data_without_label(self.cname2lab, "images_variant_train.txt", predict_label_dict)
+            sstrain = self.read_data_without_label(self.cname2lab, "images_variant_test.txt", predict_label_dict)
         elif dataset_name in ['SSImageNet', 'SSImageNetA', 'SSImageNetR', 'SSImageNetSketch', 'SSImageNetV2']:
             sstrain = self.read_sstrain_data(self.sstrain, predict_label_dict)
             print(len(sstrain))
