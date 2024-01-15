@@ -150,6 +150,7 @@ def main(args):
             for seed in range(1, 4):
                 try:
                     prob = torch.load('./analysis_results_test/{}/50_{}_{}_random_initend/test_logits.pt'.format(cfg.DATASET.NAME, seed, SHOTS))
+                    print(prob)
                     prob_end.append(prob)
                 except:
                     print('loss')
