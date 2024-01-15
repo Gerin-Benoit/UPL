@@ -70,7 +70,6 @@ class SSImageNetA(UPLDatasetBase):
                 self.img_dir.append(item.impath)
         else:
             for item in tqdm(train):
-                print(item.impath)
                 try:
                     sub_impath = './data/' + item.impath.split('/data/')[1]
                 except:
