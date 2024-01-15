@@ -467,7 +467,7 @@ def select_top_k_similarity_per_class_with_low_conf(outputs, img_paths, conf_thr
 
         if K >= 0:
             for img_path, conf in zip(img_paths_class[:K], conf_class[:K]):
-                print(conf)
+                #print(conf)
                 if conf > 0.4:
                     predict_label_dict[img_path] = id
                     predict_conf_dict[img_path] = conf

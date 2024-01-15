@@ -533,7 +533,7 @@ class UPLTrainer(TrainerX):
         image_features_list = []
         img_paths = []
         from tqdm import tqdm
-        print(f'COMPUTE FEATURES FOR {len(data_loader)} images')
+        print(f'COMPUTE FEATURES FOR {len(data_loader)} batches')
         for batch_idx, batch in enumerate(tqdm(data_loader, desc="Processing", unit="batch")):
             input, label, impath = self.parse_batch_test_with_impath(batch)
 
@@ -750,7 +750,6 @@ class UPLTrainer(TrainerX):
 
         self.before_train()
         for self.epoch in range(self.start_epoch, self.max_epoch):
-            break
             self.before_epoch()
             self.run_epoch_with_sstrain()
             self.after_epoch(model_id)
