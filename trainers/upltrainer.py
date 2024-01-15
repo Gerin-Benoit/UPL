@@ -750,6 +750,7 @@ class UPLTrainer(TrainerX):
 
         self.before_train()
         for self.epoch in range(self.start_epoch, self.max_epoch):
+            break
             self.before_epoch()
             self.run_epoch_with_sstrain()
             self.after_epoch(model_id)

@@ -30,7 +30,6 @@ do
         --dataset-config-file configs/datasets/${DATASET}.yaml \
         --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
         --output-dir ${DIR} \
-        --no-train \
         TRAINER.UPLTrainer.N_CTX ${NCTX} \
         TRAINER.UPLTrainer.CSC ${CSC} \
         TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
