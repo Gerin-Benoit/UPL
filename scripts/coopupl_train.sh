@@ -31,9 +31,9 @@ do
         --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
         --output-dir ${DIR} \
         --n_shots ${SHOTS} \
-        TRAINER.UPLTrainer.N_CTX ${NCTX} \
-        TRAINER.UPLTrainer.CSC ${CSC} \
-        TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
+        TRAINER.CoOpUPLTrainer.N_CTX ${NCTX} \
+        TRAINER.CoOpUPLTrainer.CSC ${CSC} \
+        TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
         DATASET.NUM_SHOTS 16 \
         DATASET.CLASS_EQULE ${CLASS_EQULE} 
     fi
