@@ -361,14 +361,22 @@ class CoOpUPLTrainer(TrainerX):
     def forward_backward(self, batch):
         image, label, label_type = self.parse_batch_train(batch)
         prec = self.cfg.TRAINER.CoOpUPLTrainer.PREC
+        n_s = torch.sum(label_type == 1)
+        n_q = torch.sum(label_type == -1)
         if prec == "amp":
             with autocast():
                 output, image_features, text_features = self.model(image)
                 # loss = F.cross_entropy(output, label, self.class_weights)
-                loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
-                loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
-                # loss = self.lambda_s * loss_s + self.lambda_q * loss_q
-                loss = loss_s
+                if n_s > 0:
+                    loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
+                else:
+                    loss_s = 0
+
+                if n_q > 0:
+                    loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
+                else:
+                    loss_q = 0
+                loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.optim.zero_grad()
             self.scaler.scale(loss).backward()
             self.scaler.step(self.optim)
@@ -376,10 +384,16 @@ class CoOpUPLTrainer(TrainerX):
         else:
             output, image_features, text_features = self.model(image)
             # loss = F.cross_entropy(output, label, self.class_weights)
-            loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
-            loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
-            # loss = self.lambda_s * loss_s + self.lambda_q * loss_q
-            loss = loss_s
+            if n_s > 0:
+                loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
+            else:
+                loss_s = 0
+
+            if n_q > 0:
+                loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
+            else:
+                loss_q = 0
+            loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.model_backward_and_update(loss)
 
         loss_summary = {
@@ -398,8 +412,6 @@ class CoOpUPLTrainer(TrainerX):
         input = batch["img"]
         label = batch["label"]
         label_type = batch["label_type"]
-        print(label)
-        print(label_type)
         label_type_converted = [1 if x == 's' else -1 for x in label_type]
 
         # Convert to a Torch tensor
