@@ -8,11 +8,12 @@ import os
 
 
 class UPLDatasetBase(DatasetBase):
-    def __init__(self, train_x=None, train_u=None, val=None, test=None, novel=None, base=None, sstrain=None):
+    def __init__(self, train_x=None, train_u=None, val=None, test=None, novel=None, base=None, sstrain=None, transductive=None):
         super().__init__(train_x=train_x, val=val, test=test)
         self._novel = novel
         self._base = base
         self.sstrain = sstrain
+        self.transductive = transductive
         self._lab2cname_novel, _  = self.get_lab2cname(novel) 
         self._lab2cname_base, _ = self.get_lab2cname(base)
 

@@ -238,7 +238,7 @@ class UPLDataManager(DataManager):
         self.train_loader_sstrain = train_loader_sstrain
 
         # modify datum to add label_type
-
+        print("HERE=================================================================================")
         transductive_loader = build_transductive_loader(
             self.cfg,
             sampler_type="RandomSampler",
@@ -253,6 +253,7 @@ class UPLDataManager(DataManager):
             is_train=False,
             dataset_wrapper=None,
         )
+        print(len(self.dataset.train_x), sstrain)
         self.transductive_loader = transductive_loader
 
 
