@@ -729,6 +729,7 @@ class UPLTrainer(TrainerX):
         self.val_loader = dm.val_loader  # optional, can be None
         self.test_loader = dm.test_loader
         self.train_loader_sstrain = dm.train_loader_sstrain
+        self.transductive_loader = dm.transductive_loader
         self.num_classes = dm.num_classes
         self.num_source_domains = dm.num_source_domains
         self.lab2cname = dm.lab2cname  # dict {label: classname}
