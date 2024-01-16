@@ -31,11 +31,42 @@ from clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
 from datasets.data_manager import UPLDataManager
 from evaluation.evaluator import UPLClassification
 from .hhzsclip import ZeroshotCLIP
-from .utils import (select_top_k_similarity_per_class, caculate_noise_rate, save_outputs, 
-select_top_k_similarity, select_top_by_value, caculate_noise_rate_analyze)
+from .utils import (select_top_k_similarity_per_class, caculate_noise_rate, save_outputs,
+                    select_top_k_similarity, select_top_by_value, caculate_noise_rate_analyze)
+from torch.utils.data import Dataset, DataLoader
+
+
+class TransductiveDataset(Dataset):
+    def __init__(self, dataset1, dataset2, label1, label2):
+        self.dataset1 = dataset1
+        self.dataset2 = dataset2
+        self.label1 = label1
+        self.label2 = label2
+
+        # Store the sizes of the individual datasets
+        self.dataset1_size = len(dataset1)
+        self.dataset2_size = len(dataset2)
+
+        # Total size is the sum of both datasets
+        self.total_size = self.dataset1_size + self.dataset2_size
+
+    def __len__(self):
+        return self.total_size
+
+    def __getitem__(self, idx):
+        if idx < self.dataset1_size:
+            data = self.dataset1[idx]
+            label_type = self.label1
+        else:
+            data = self.dataset2[idx - self.dataset1_size]
+            label_type = self.label2
+
+        # Assuming 'data' is a dictionary with 'img' and 'label'
+        data['label_type'] = label_type
+        return data
+
 
 _tokenizer = _Tokenizer()
-
 
 CUSTOM_TEMPLATES = {
     "OxfordPets": "a photo of a {}, a type of pet.",
@@ -128,7 +159,7 @@ class PromptLearner(nn.Module):
             prompt = clip.tokenize(ctx_init)
             with torch.no_grad():
                 embedding = clip_model.token_embedding(prompt).type(dtype)
-            ctx_vectors = embedding[0, 1 : 1 + n_ctx, :]
+            ctx_vectors = embedding[0, 1: 1 + n_ctx, :]
             prompt_prefix = ctx_init
 
         else:
@@ -160,7 +191,7 @@ class PromptLearner(nn.Module):
         # but they should be ignored in load_model() as we want to use
         # those computed using the current class names
         self.register_buffer("token_prefix", embedding[:, :1, :])  # SOS
-        self.register_buffer("token_suffix", embedding[:, 1 + n_ctx :, :])  # CLS, EOS
+        self.register_buffer("token_suffix", embedding[:, 1 + n_ctx:, :])  # CLS, EOS
 
         self.n_cls = n_cls
         self.n_ctx = n_ctx
@@ -180,7 +211,7 @@ class PromptLearner(nn.Module):
             prompts = torch.cat(
                 [
                     prefix,  # (n_cls, 1, dim)
-                    ctx,     # (n_cls, n_ctx, dim)
+                    ctx,  # (n_cls, n_ctx, dim)
                     suffix,  # (n_cls, *, dim)
                 ],
                 dim=1,
@@ -191,18 +222,18 @@ class PromptLearner(nn.Module):
             prompts = []
             for i in range(self.n_cls):
                 name_len = self.name_lens[i]
-                prefix_i = prefix[i : i + 1, :, :]
-                class_i = suffix[i : i + 1, :name_len, :]
-                suffix_i = suffix[i : i + 1, name_len:, :]
-                ctx_i_half1 = ctx[i : i + 1, :half_n_ctx, :]
-                ctx_i_half2 = ctx[i : i + 1, half_n_ctx:, :]
+                prefix_i = prefix[i: i + 1, :, :]
+                class_i = suffix[i: i + 1, :name_len, :]
+                suffix_i = suffix[i: i + 1, name_len:, :]
+                ctx_i_half1 = ctx[i: i + 1, :half_n_ctx, :]
+                ctx_i_half2 = ctx[i: i + 1, half_n_ctx:, :]
                 prompt = torch.cat(
                     [
-                        prefix_i,     # (1, 1, dim)
+                        prefix_i,  # (1, 1, dim)
                         ctx_i_half1,  # (1, n_ctx//2, dim)
-                        class_i,      # (1, name_len, dim)
+                        class_i,  # (1, name_len, dim)
                         ctx_i_half2,  # (1, n_ctx//2, dim)
-                        suffix_i,     # (1, *, dim)
+                        suffix_i,  # (1, *, dim)
                     ],
                     dim=1,
                 )
@@ -213,15 +244,15 @@ class PromptLearner(nn.Module):
             prompts = []
             for i in range(self.n_cls):
                 name_len = self.name_lens[i]
-                prefix_i = prefix[i : i + 1, :, :]
-                class_i = suffix[i : i + 1, :name_len, :]
-                suffix_i = suffix[i : i + 1, name_len:, :]
-                ctx_i = ctx[i : i + 1, :, :]
+                prefix_i = prefix[i: i + 1, :, :]
+                class_i = suffix[i: i + 1, :name_len, :]
+                suffix_i = suffix[i: i + 1, name_len:, :]
+                ctx_i = ctx[i: i + 1, :, :]
                 prompt = torch.cat(
                     [
                         prefix_i,  # (1, 1, dim)
-                        class_i,   # (1, name_len, dim)
-                        ctx_i,     # (1, n_ctx, dim)
+                        class_i,  # (1, name_len, dim)
+                        ctx_i,  # (1, n_ctx, dim)
                         suffix_i,  # (1, *, dim)
                     ],
                     dim=1,
@@ -257,13 +288,12 @@ class CustomCLIP(nn.Module):
 
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        
 
         logit_scale = self.logit_scale.exp()
         logits = logit_scale * image_features @ text_features.t()
 
         return logits, image_features, text_features
-    
+
     def zero_shot_forward(self, image, device):
         temp = CUSTOM_TEMPLATES[self.cfg.DATASET.NAME]
         prompts = [temp.format(c.replace("_", " ")) for c in self.classnames]
@@ -279,9 +309,6 @@ class CustomCLIP(nn.Module):
         logit_scale = self.clip.logit_scale.exp()
         logits = logit_scale * image_features @ text_features.t()
         return logits, image_features, text_features
-
-
-
 
 
 @TRAINER_REGISTRY.register()
@@ -300,7 +327,7 @@ class CoOpUPLTrainer(TrainerX):
 
         print(f"Loading CLIP (backbone: {cfg.MODEL.BACKBONE.NAME})")
         clip_model = load_clip_to_cpu(cfg)
-        
+
         if cfg.TRAINER.CoOpUPLTrainer.PREC == "fp32" or cfg.TRAINER.CoOpUPLTrainer.PREC == "amp":
             # CLIP's default precision is fp16
             clip_model.float()
@@ -407,7 +434,7 @@ class CoOpUPLTrainer(TrainerX):
             print("Loading weights to {} " 'from "{}" (epoch = {})'.format(name, model_path, epoch))
             # set strict=False
             self._models[name].load_state_dict(state_dict, strict=False)
-        
+
     def load_model_by_id(self, directory, model_id, epoch=None):
         if not directory:
             print(
@@ -434,11 +461,11 @@ class CoOpUPLTrainer(TrainerX):
             checkpoint = load_checkpoint(model_path)
             state_dict = checkpoint['state_dict']
             epoch = checkpoint['epoch']
-            
+
             # Ignore fixed token vectors
             if 'token_prefix' in state_dict:
                 del state_dict['token_prefix']
-            
+
             if 'token_suffix' in state_dict:
                 del state_dict['token_suffix']
 
@@ -448,24 +475,28 @@ class CoOpUPLTrainer(TrainerX):
             )
             # set strict=False
             self._models[name].load_state_dict(state_dict, strict=False)
-    
+
     @torch.no_grad()
     def test(self, split=None, trainer_list=None):
         """A generic testing pipeline."""
-    
+
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS)+'_random_init'+str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+                                 str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
+                                     self.cfg.DATASET.NUM_SHOTS) + '_random_init' + str(
+                                     self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
         results_id = 0
         while os.path.exists(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id))):
             results_id += 1
-        self.per_image_txt_writer = open(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
-        self.per_class_txt_writer = open(os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_image_txt_writer = open(
+            os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_class_txt_writer = open(
+            os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
 
         if split is None:
             split = self.cfg.TEST.SPLIT
@@ -473,13 +504,13 @@ class CoOpUPLTrainer(TrainerX):
         if split == "val" and self.val_loader is not None:
             data_loader = self.val_loader
             print("Do evaluation on {} set".format(split))
-        elif split=="novel":
+        elif split == "novel":
             data_loader = self.test_novel_loader
             print("Do evaluation on test novel set")
-        elif split=="base":
+        elif split == "base":
             data_loader = self.test_base_loader
             print("Do evaluation on test base set")
-        elif split=="all":
+        elif split == "all":
             data_loader = self.test_loader
             print("Do evaluation on test set")
         else:
@@ -492,7 +523,7 @@ class CoOpUPLTrainer(TrainerX):
         text_features_all = []
         for batch_idx, batch in enumerate(data_loader):
             input, label = self.parse_batch_test(batch)
-            if trainer_list is None or len(trainer_list)==1:
+            if trainer_list is None or len(trainer_list) == 1:
                 # 如果不是ensemble的测试
                 output, image_features, text_features = self.model_inference(input)
                 image_features_all.append(image_features)
@@ -515,11 +546,9 @@ class CoOpUPLTrainer(TrainerX):
                 torch.save(image_features_all, os.path.join(save_path, '{}_targets.pt'.format(split)))
                 torch.save(outputs_all, os.path.join(save_path, '{}_logits.pt'.format(split)))
                 torch.save(text_features_all, os.path.join(save_path, '{}_l_features.pt'.format(split)))
-                
-               
+
         self.per_image_txt_writer.close()
         self.per_class_txt_writer.close()
-        
 
         for k, v in results.items():
             tag = "{}/{}".format(split, k)
@@ -541,7 +570,7 @@ class CoOpUPLTrainer(TrainerX):
         from tqdm import tqdm
         for batch_idx, batch in tqdm(enumerate(data_loader)):
             input, label, impath = self.parse_batch_test_with_impath(batch)
-            if trainer_list is None or len(trainer_list)==1:
+            if trainer_list is None or len(trainer_list) == 1:
                 # 如果不是ensemble的测试
                 output, image_features, text_features = self.model.zero_shot_forward(input, self.device)
             else:
@@ -557,11 +586,12 @@ class CoOpUPLTrainer(TrainerX):
         # text_features = torch.cat(text_features, axis=0)
         print('image_features', image_features.shape)
         print('text_features', text_features.shape)
-        predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1, image_features, True)
-        save_outputs(self.train_loader_x, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)
+        predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1,
+                                                                  image_features, True)
+        save_outputs(self.train_loader_x, self, predict_label_dict, self.cfg.DATASET.NAME, text_features,
+                     backbone_name=self.cfg.MODEL.BACKBONE.NAME)
         caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_x, trainer=self)
         return predict_label_dict
-
 
     def load_from_exist_file(self, file_path, model_names):
         logits = None
@@ -572,22 +602,23 @@ class CoOpUPLTrainer(TrainerX):
                 logits = torch.load(logist_path)
             else:
                 logits += torch.load(logist_path)
-            
+
             info_path = os.path.join(model_path, '{}.json'.format(self.cfg.DATASET.NAME))
             info = json.load(open(info_path))
             items = []
             for c in info:
                 for img_path in info[c]:
                     item = info[c][img_path]
-                    items.append([img_path, int(item[3])]) # 路径 序号
-            sorted(items, key=(lambda x:x[1]))
-            sstrain_img_paths = np.array(items)[:,0]
-
+                    items.append([img_path, int(item[3])])  # 路径 序号
+            sorted(items, key=(lambda x: x[1]))
+            sstrain_img_paths = np.array(items)[:, 0]
 
         logits /= len(model_names)
-        predict_label_dict, predict_conf_dict = select_top_k_similarity_per_class(logits, sstrain_img_paths, K=self.cfg.DATASET.NUM_SHOTS, is_softmax=False)
+        predict_label_dict, predict_conf_dict = select_top_k_similarity_per_class(logits, sstrain_img_paths,
+                                                                                  K=self.cfg.DATASET.NUM_SHOTS,
+                                                                                  is_softmax=False)
         return predict_label_dict, predict_conf_dict
-    
+
     @torch.no_grad()
     def zero_shot_predict(self, trainer_list=None):
         """A generic predicting pipeline."""
@@ -595,8 +626,9 @@ class CoOpUPLTrainer(TrainerX):
         self.model.eval()
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS))
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+                                 str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
+                                     self.cfg.DATASET.NUM_SHOTS))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
@@ -605,10 +637,9 @@ class CoOpUPLTrainer(TrainerX):
         outputs = []
         img_paths = []
 
-        
         for batch_idx, batch in tqdm(enumerate(data_loader)):
             input, label, impath = self.parse_batch_test_with_impath(batch)
-            if trainer_list is None or len(trainer_list)==1:
+            if trainer_list is None or len(trainer_list) == 1:
                 # 如果不是ensemble的测试
                 output, image_features, text_features = self.model.zero_shot_forward(input, self.device)
             else:
@@ -618,18 +649,18 @@ class CoOpUPLTrainer(TrainerX):
             outputs.append(output)
             img_paths.append(impath)
 
-
         outputs = torch.cat(outputs, dim=0)
         img_paths = np.concatenate(img_paths, axis=0)
-        
-        
+
         # 尽力维持类别平衡
         if self.cfg.DATASET.CLASS_EQULE is True:
             if self.cfg.DATASET.CONF_THRESHOLD > 0:
                 # 选择置信度大于一定值 & 选择
-                predict_label_dict_1, predict_conf_dict_1 = select_top_k_similarity_per_class(outputs, img_paths, K=self.cfg.DATASET.NUM_SHOTS) 
-                predict_label_dict_2, predict_conf_dict_2 = select_top_by_value(outputs, img_paths, conf_threshold=self.cfg.DATASET.CONF_THRESHOLD) 
-                
+                predict_label_dict_1, predict_conf_dict_1 = select_top_k_similarity_per_class(outputs, img_paths,
+                                                                                              K=self.cfg.DATASET.NUM_SHOTS)
+                predict_label_dict_2, predict_conf_dict_2 = select_top_by_value(outputs, img_paths,
+                                                                                conf_threshold=self.cfg.DATASET.CONF_THRESHOLD)
+
                 print(len(predict_label_dict_1), 'predict_label_dict_1')
                 print(len(predict_label_dict_2), 'predict_label_dict_2')
 
@@ -640,17 +671,20 @@ class CoOpUPLTrainer(TrainerX):
 
             else:
                 print("K {} shots".format(self.cfg.DATASET.NUM_SHOTS))
-                predict_label_dict, predict_conf_dict = select_top_k_similarity_per_class(outputs, img_paths, K=self.cfg.DATASET.NUM_SHOTS) 
-                caculate_noise_rate(predict_label_dict,  train_loader=self.train_loader_x, trainer=self)
+                predict_label_dict, predict_conf_dict = select_top_k_similarity_per_class(outputs, img_paths,
+                                                                                          K=self.cfg.DATASET.NUM_SHOTS)
+                caculate_noise_rate(predict_label_dict, train_loader=self.train_loader_x, trainer=self)
                 print('select {} samples'.format(len(predict_label_dict)))
 
         else:
-            print("K", self.cfg.DATASET.NUM_SHOTS*text_features.shape[0])
-            predict_label_dict, predict_conf_dict = select_top_k_similarity(outputs, img_paths, K=self.cfg.DATASET.NUM_SHOTS*text_features.shape[0]) 
+            print("K", self.cfg.DATASET.NUM_SHOTS * text_features.shape[0])
+            predict_label_dict, predict_conf_dict = select_top_k_similarity(outputs, img_paths,
+                                                                            K=self.cfg.DATASET.NUM_SHOTS *
+                                                                              text_features.shape[0])
             caculate_noise_rate(predict_label_dict, train_loader=self.train_loader_x, trainer=self)
             print('select {} samples'.format(len(predict_label_dict)))
         return predict_label_dict, predict_conf_dict
-    
+
     @torch.no_grad()
     def zero_shot_test(self, split=None, trainer_list=None):
         """A generic predicting pipeline."""
@@ -658,38 +692,42 @@ class CoOpUPLTrainer(TrainerX):
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS))
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+                                 str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
+                                     self.cfg.DATASET.NUM_SHOTS))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
         results_id = 0
         while os.path.exists(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id))):
             results_id += 1
-        self.per_image_txt_writer = open(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
-        self.per_class_txt_writer = open(os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_image_txt_writer = open(
+            os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_class_txt_writer = open(
+            os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
 
         if split is None:
             split = self.cfg.TEST.SPLIT
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS))
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+                                 str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
+                                     self.cfg.DATASET.NUM_SHOTS))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
         if split == "val" and self.val_loader is not None:
             data_loader = self.val_loader
             print("Do evaluation on {} set".format(split))
-        elif split=="novel":
+        elif split == "novel":
             data_loader = self.test_novel_loader
             print("Do evaluation on test novel set")
-        elif split=="base":
+        elif split == "base":
             data_loader = self.test_base_loader
             print("Do evaluation on test base set")
-        elif split=="all":
+        elif split == "all":
             data_loader = self.test_loader
             print("Do evaluation on test set")
-        elif split=="train":
+        elif split == "train":
             data_loader = self.train_loader_x
             print("Do evaluation on train set")
         else:
@@ -698,7 +736,7 @@ class CoOpUPLTrainer(TrainerX):
 
         for batch_idx, batch in enumerate(data_loader):
             input, label, impath = self.parse_batch_test_with_impath(batch)
-            if trainer_list is None or len(trainer_list)==1:
+            if trainer_list is None or len(trainer_list) == 1:
                 # 如果不是ensemble的测试
                 output, image_features, text_features = self.model.zero_shot_forward(input, self.device)
             else:
@@ -707,7 +745,7 @@ class CoOpUPLTrainer(TrainerX):
                 output = sum(outputs) / len(outputs)
             self.evaluator.process(output, label, self.per_image_txt_writer, self.per_class_txt_writer)
         results = self.evaluator.evaluate()
-        
+
         for k, v in results.items():
             tag = "{}/{}".format(split, k)
             self.write_scalar(tag, v, self.epoch)
@@ -717,8 +755,6 @@ class CoOpUPLTrainer(TrainerX):
 
         return list(results.values())[0]
 
-
-    
     def build_data_loader(self):
         """Create essential data-related attributes.
 
@@ -735,14 +771,13 @@ class CoOpUPLTrainer(TrainerX):
         self.num_classes = dm.num_classes
         self.num_source_domains = dm.num_source_domains
         self.lab2cname = dm.lab2cname  # dict {label: classname}
-        
+
         if self.cfg.DATALOADER.OPEN_SETTING:
             self.test_novel_loader = dm.test_novel_loader
             self.test_base_loader = dm.test_base_loader
-        
 
         self.dm = dm
-    
+
     def sstrain_with_id(self, model_id):
         self.sstrain(self.start_epoch, self.max_epoch, model_id)
 
@@ -757,12 +792,21 @@ class CoOpUPLTrainer(TrainerX):
             self.run_epoch_with_sstrain()
             self.after_epoch(model_id)
         self.after_train(model_id)
-    
+
     def run_epoch_with_sstrain(self):
         self.set_model_mode("train")
         losses = MetricMeter()
         batch_time = AverageMeter()
         data_time = AverageMeter()
+
+        # HERE merge shots and PL.
+
+        shots_loader = self.train_loader_x
+        pls_loader = self.train_loader_sstrain
+
+        merged_dataset = TransductiveDataset(shots_loader.dataset, pls_loader.dataset, 's', 'q')
+        merged_loader = DataLoader(merged_dataset, batch_size=YOUR_BATCH_SIZE, shuffle=True)
+
         self.num_batches = len(self.train_loader_sstrain)
 
         end = time.time()
@@ -773,13 +817,13 @@ class CoOpUPLTrainer(TrainerX):
             losses.update(loss_summary)
 
             if (
-                self.batch_idx + 1
+                    self.batch_idx + 1
             ) % self.cfg.TRAIN.PRINT_FREQ == 0 or self.num_batches < self.cfg.TRAIN.PRINT_FREQ:
                 nb_remain = 0
                 nb_remain += self.num_batches - self.batch_idx - 1
                 nb_remain += (
-                    self.max_epoch - self.epoch - 1
-                ) * self.num_batches
+                                     self.max_epoch - self.epoch - 1
+                             ) * self.num_batches
                 eta_seconds = batch_time.avg * nb_remain
                 eta = str(datetime.timedelta(seconds=int(eta_seconds)))
                 print(
@@ -807,7 +851,7 @@ class CoOpUPLTrainer(TrainerX):
             self.write_scalar("train/lr", self.get_current_lr(), n_iter)
 
             end = time.time()
-    
+
     def after_epoch(self, model_id):
         last_epoch = (self.epoch + 1) == self.max_epoch
         do_test = not self.cfg.TEST.NO_TEST
@@ -830,10 +874,10 @@ class CoOpUPLTrainer(TrainerX):
 
         if meet_checkpoint_freq or last_epoch:
             self.save_model(
-                    self.epoch,
-                    self.output_dir,
-                    model_name="model-best-{}.pth.tar".format(model_id)
-                )
+                self.epoch,
+                self.output_dir,
+                model_name="model-best-{}.pth.tar".format(model_id)
+            )
 
     def after_train(self, model_id):
         print("Finished training")
@@ -847,7 +891,6 @@ class CoOpUPLTrainer(TrainerX):
             # self.test(split='base')
             # self.test(split='train')
             self.test(split='test')
-            
 
         # Show elapsed time
         elapsed = round(time.time() - self.time_start)
@@ -860,44 +903,47 @@ class CoOpUPLTrainer(TrainerX):
     def parse_batch_test(self, batch):
         input = batch["img"]
         label = batch["label"]
-        #label_type = batch["label_type"]
+        # label_type = batch["label_type"]
 
         input = input.to(self.device)
         label = label.to(self.device)
-        #label_type = label_type.to(self.device)
+        # label_type = label_type.to(self.device)
 
         return input, label
-    
+
     def parse_batch_test_with_impath(self, batch):
         input = batch["img"]
         label = batch["label"]
-        #label_type = batch["label_type"]
+        # label_type = batch["label_type"]
         impath = batch["impath"]
 
         input = input.to(self.device)
         label = label.to(self.device)
-        #label_type = label_type.to(self.device)
+        # label_type = label_type.to(self.device)
         # impath = impath.to(self.device)
 
         return input, label, impath
 
     @torch.no_grad()
     def test_with_existing_logits(self, logits, split='test'):
-       
 
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME, 
-        str(self.cfg.OPTIM.MAX_EPOCH)+'_'+str(self.cfg.SEED)+'_'+str(self.cfg.DATASET.NUM_SHOTS)+'_random_init'+str(self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+                                 str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
+                                     self.cfg.DATASET.NUM_SHOTS) + '_random_init' + str(
+                                     self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
         results_id = 0
         while os.path.exists(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id))):
             results_id += 1
-        self.per_image_txt_writer = open(os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
-        self.per_class_txt_writer = open(os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_image_txt_writer = open(
+            os.path.join(save_path, 'per_image_results_{}_{}.txt'.format(split, results_id)), 'w')
+        self.per_class_txt_writer = open(
+            os.path.join(save_path, 'per_class_results_{}_{}.txt'.format(split, results_id)), 'w')
 
         if split is None:
             split = self.cfg.TEST.SPLIT
@@ -905,13 +951,13 @@ class CoOpUPLTrainer(TrainerX):
         if split == "val" and self.val_loader is not None:
             data_loader = self.val_loader
             print("Do evaluation on {} set".format(split))
-        elif split=="novel":
+        elif split == "novel":
             data_loader = self.test_novel_loader
             print("Do evaluation on test novel set")
-        elif split=="base":
+        elif split == "base":
             data_loader = self.test_base_loader
             print("Do evaluation on test base set")
-        elif split=="all":
+        elif split == "all":
             data_loader = self.test_loader
             print("Do evaluation on test set")
         else:

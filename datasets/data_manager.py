@@ -19,7 +19,12 @@ def build_data_loader(
     dataset_wrapper=None,
     tag=None
 ):
-    # Build sampler
+    # Build sample
+
+    print("DATASOURCE ==============================================================")
+    print(type(data_source))
+    print(data_source)
+
     if sampler_type is not None:
         sampler = build_sampler(
             sampler_type,
@@ -135,7 +140,7 @@ class UPLDataManager(DataManager):
                     tfm=tfm_test, # 这个是不训练的，所以要用测试的配置，
                     is_train=False,
                     dataset_wrapper=dataset_wrapper,
-                    tag='sstrain'
+                    tag='x'
                 )
                 self.train_loader_x = train_loader_x
         except:
@@ -163,7 +168,7 @@ class UPLDataManager(DataManager):
             n_domain=self.cfg.DATALOADER.TRAIN_X.N_DOMAIN,
             n_ins=1, # 每个类别n_ins个instance
             tfm=self.tfm_train,
-            is_train=True,
+            is_train=False,
             dataset_wrapper=self.dataset_wrapper,
         )
         self.train_loader_sstrain = train_loader_sstrain
