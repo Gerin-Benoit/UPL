@@ -243,7 +243,7 @@ class UPLDataManager(DataManager):
             self.cfg,
             sampler_type="RandomSampler",
             sampler=None,
-            data_s=self.train_x,
+            data_s=self.dataset.train_x,
             data_q=sstrain,
             batch_size=self.cfg.DATALOADER.TRAIN_X.BATCH_SIZE,
             n_domain=self.cfg.DATALOADER.TRAIN_X.N_DOMAIN,
