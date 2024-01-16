@@ -368,7 +368,7 @@ class CoOpUPLTrainer(TrainerX):
                 loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
                 loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
                 # loss = self.lambda_s * loss_s + self.lambda_q * loss_q
-                loss = loss_q
+                loss = loss_s
             self.optim.zero_grad()
             self.scaler.scale(loss).backward()
             self.scaler.step(self.optim)
@@ -379,7 +379,7 @@ class CoOpUPLTrainer(TrainerX):
             loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
             loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
             # loss = self.lambda_s * loss_s + self.lambda_q * loss_q
-            loss = loss_q
+            loss = loss_s
             self.model_backward_and_update(loss)
 
         loss_summary = {
