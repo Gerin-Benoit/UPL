@@ -9,7 +9,7 @@ _C = CN()
 _C.VERSION = 1
 
 # Directory to save the output files (like log.txt and model weights)
-_C.OUTPUT_DIR = "./output"
+_C.OUTPUT_DIR = "./output_transductive"
 # Path to a directory where the files were saved previously
 _C.RESUME = ""
 # Set seed to negative value to randomize everything
@@ -72,7 +72,7 @@ _C.DATASET.TARGET_DOMAINS = ()
 _C.DATASET.NUM_LABELED = -1
 # Number of images per class
 _C.DATASET.NUM_SHOTS = -1  # PL
-_C.DATASET.NUM_TRUE_SHOTS = -1  # True Shots
+_C.DATASET.NUM_TRUE_SHOTS = 0  # True Shots
 # Percentage of validation data (only used for SSL datasets)
 # Set to 0 if do not want to use val data
 # Using val data for hyperparameter tuning was done in Oliver et al. 2018

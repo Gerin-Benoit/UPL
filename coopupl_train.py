@@ -69,6 +69,9 @@ def reset_cfg(cfg, args):
     if args.head:
         cfg.MODEL.HEAD.NAME = args.head
 
+    if args.n_shots:
+        cfg.DATASET.NUM_TRUE_SHOTS = args.n_shots
+
 
 def extend_cfg(cfg, args):
     """
@@ -91,6 +94,7 @@ def extend_cfg(cfg, args):
     cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION = "end"  # 'middle' or 'end' or 'front'
     cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S = args.lambda_s
     cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q = args.lambda_q
+    # cfg.DATASET.NUM_TRUE_SHOTS = args.n_shots
 
 def setup_cfg(args):
     cfg = get_cfg_default()
@@ -217,12 +221,6 @@ if __name__ == '__main__':
         '--no-train', action='store_true', help='do not call trainer.train()'
     )
     parser.add_argument(
-        'opts',
-        default=None,
-        nargs=argparse.REMAINDER,
-        help='modify config options using the command-line'
-    )
-    parser.add_argument(
         '--lambda_s',
         type=float,
         default=0.5,
@@ -234,5 +232,18 @@ if __name__ == '__main__':
         default=0.5,
         help='cross entropy loss weight for query samples'
     )
+    parser.add_argument(
+        '--n_shots',
+        type=int,
+        default=0,
+        help='Number of shots for transductive'
+    )
+    parser.add_argument(
+        'opts',
+        default=None,
+        nargs=argparse.REMAINDER,
+        help='modify config options using the command-line'
+    )
+
     args = parser.parse_args()
     main(args)

@@ -802,10 +802,10 @@ class CoOpUPLTrainer(TrainerX):
         # HERE merge shots and PL.
         data_loader = self.transductive_loader
 
-        self.num_batches = len(self.train_loader_sstrain)
+        self.num_batches = len(data_loader)
 
         end = time.time()
-        for self.batch_idx, batch in enumerate(self.train_loader_sstrain):
+        for self.batch_idx, batch in enumerate(data_loader):
             data_time.update(time.time() - end)
             loss_summary = self.forward_backward(batch)
             batch_time.update(time.time() - end)
@@ -927,8 +927,8 @@ class CoOpUPLTrainer(TrainerX):
 
         save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
-                                     self.cfg.DATASET.NUM_SHOTS) + '_random_init' + str(
-                                     self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
+                                     self.cfg.DATASET.NUM_SHOTS) + '_' + self.cfg.DATASET.NUM_TRUE_SHOTS + '_random_init '
+                                    + str(self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
