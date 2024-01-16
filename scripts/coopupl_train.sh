@@ -18,7 +18,7 @@ LAMBDA_S=$9
 LAMBDA_Q=$10
 
 
-for SEED in {1} # {1..3}
+for SEED in 1 # {1..3}
 do
     DIR=./output_transductive/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
     if [ -d "$DIR" ]; then
