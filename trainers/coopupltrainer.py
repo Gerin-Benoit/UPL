@@ -365,8 +365,8 @@ class CoOpUPLTrainer(TrainerX):
             with autocast():
                 output, image_features, text_features = self.model(image)
                 # loss = F.cross_entropy(output, label, self.class_weights)
-                loss_s = F.cross_entropy(output[label_type == 's'], label[label_type == 's'])
-                loss_q = F.cross_entropy(output[label_type == 'q'], label[label_type == 'q'])
+                loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
+                loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
                 loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.optim.zero_grad()
             self.scaler.scale(loss).backward()
@@ -375,8 +375,8 @@ class CoOpUPLTrainer(TrainerX):
         else:
             output, image_features, text_features = self.model(image)
             # loss = F.cross_entropy(output, label, self.class_weights)
-            loss_s = F.cross_entropy(output[label_type == 's'], label[label_type == 's'])
-            loss_q = F.cross_entropy(output[label_type == 'q'], label[label_type == 'q'])
+            loss_s = F.cross_entropy(output[label_type == 1], label[label_type == 1])
+            loss_q = F.cross_entropy(output[label_type == -1], label[label_type == -1])
             loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.model_backward_and_update(loss)
 
@@ -396,6 +396,12 @@ class CoOpUPLTrainer(TrainerX):
         input = batch["img"]
         label = batch["label"]
         label_type = batch["label_type"]
+
+        label_type_converted = [1 if x == 's' else -1 for x in label_type]
+
+        # Convert to a Torch tensor
+        label_type_tensor = torch.tensor(label_type_converted)
+
         input = input.to(self.device)
         label = label.to(self.device)
         label_type = label_type.to(self.device)
