@@ -116,7 +116,10 @@ class SSFGVCAircraft(UPLDatasetBase):
                     imname = line[0] + ".jpg"
                     classname = " ".join(line[1:])
                     impath = os.path.join(self.image_dir, imname)
-                    sub_impath = './data/' + impath.split('/data/')[1]
+                    try:
+                        sub_impath = './data/' + impath.split('/data/')[1]
+                    except:
+                        sub_impath = impath.split
                     if sub_impath in predict_label_dict:
                         item = Datum(impath=impath, label=predict_label_dict[sub_impath], classname=self._lab2cname[predict_label_dict[sub_impath]])
                         items.append(item)

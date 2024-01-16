@@ -399,21 +399,33 @@ def select_top_k_similarity_per_class_with_high_conf(outputs, img_paths, K=1, im
             img_features = image_features[index]
             if K >= 0:
                 for img_path, img_feature, conf, logit in zip(img_paths_class[:K], img_features[:K], conf_class[:K], output_class[:K]):
-                    img_path = './data/' + img_path.split('/data/')[1]
+                    try:
+                        img_path = './data/' + img_path.split('/data/')[1]
+                    except:
+                        pass
                     predict_label_dict[img_path] = [id, img_feature, conf, logit]
             else:
                 for img_path, img_feature, conf, logit in zip(img_paths_class, img_features, conf_class, output_class):
-                    img_path = './data/' + img_path.split('/data/')[1]
+                    try:
+                        img_path = './data/' + img_path.split('/data/')[1]
+                    except:
+                        pass
                     predict_label_dict[img_path] = [id, img_feature, conf, logit]
         else:
             if K >= 0:
                 for img_path, conf in zip(img_paths_class[:K], conf_class):
-                    img_path = './data/' + img_path.split('/data/')[1]
+                    try:
+                        img_path = './data/' + img_path.split('/data/')[1]
+                    except:
+                        pass
                     predict_label_dict[img_path] = id
                     predict_conf_dict[img_path] = conf
             else:
                 for img_path, conf in zip(img_paths_class, conf_class):
-                    img_path = './data/' + img_path.split('/data/')[1]
+                    try:
+                        img_path = './data/' + img_path.split('/data/')[1]
+                    except:
+                        pass
                     predict_label_dict[img_path] = id
                     predict_conf_dict[img_path] = conf
     return predict_label_dict, predict_conf_dict, remain_ids, selected_ids
@@ -455,7 +467,7 @@ def select_top_k_similarity_per_class_with_low_conf(outputs, img_paths, conf_thr
 
         if K >= 0:
             for img_path, conf in zip(img_paths_class[:K], conf_class[:K]):
-                print(conf)
+                #print(conf)
                 if conf > 0.4:
                     predict_label_dict[img_path] = id
                     predict_conf_dict[img_path] = conf

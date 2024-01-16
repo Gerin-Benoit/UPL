@@ -533,9 +533,10 @@ class UPLTrainer(TrainerX):
         image_features_list = []
         img_paths = []
         from tqdm import tqdm
-        print(f'COMPUTE FEATURES FOR {len(data_loader)} images')
+        print(f'COMPUTE FEATURES FOR {len(data_loader)} batches')
         for batch_idx, batch in enumerate(tqdm(data_loader, desc="Processing", unit="batch")):
             input, label, impath = self.parse_batch_test_with_impath(batch)
+
             if trainer_list is None or len(trainer_list)==1:
                 # 如果不是ensemble的测试
                 output, image_features, text_features = self.model.zero_shot_forward(input, self.device)
