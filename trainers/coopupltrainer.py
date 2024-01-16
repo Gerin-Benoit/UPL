@@ -800,12 +800,7 @@ class CoOpUPLTrainer(TrainerX):
         data_time = AverageMeter()
 
         # HERE merge shots and PL.
-
-        shots_loader = self.train_loader_x
-        pls_loader = self.train_loader_sstrain
-
-        merged_dataset = TransductiveDataset(shots_loader.dataset, pls_loader.dataset, 's', 'q')
-        merged_loader = DataLoader(merged_dataset, batch_size=YOUR_BATCH_SIZE, shuffle=True)
+        data_loader = self.transductive_loader
 
         self.num_batches = len(self.train_loader_sstrain)
 

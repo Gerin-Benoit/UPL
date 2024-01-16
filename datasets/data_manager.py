@@ -10,6 +10,63 @@ from dassl.data.samplers import build_sampler
 from torch.utils.data import DataLoader, WeightedRandomSampler
 import torch
 
+def build_transductive_loader(
+    cfg,
+    sampler_type="RandomSampler",
+    sampler=None,
+    data_s=None,
+    data_q=None,
+    batch_size=64,
+    n_domain=0,
+    n_ins=2,
+    tfm_s=None,
+    tfm_q=None,
+    is_train=True,
+    dataset_wrapper=None,
+    tag=None
+):
+    # Build sample
+
+    if sampler_type is not None:
+        sampler = build_sampler(
+            sampler_type,
+            cfg=cfg,
+            data_source=data_s+data_q,
+            batch_size=batch_size,
+            n_domain=n_domain,
+            n_ins=n_ins,
+        )
+    else:
+        sampler = sampler
+
+    if dataset_wrapper is None:
+        dataset_wrapper = TransductiveDatasetWrapper
+
+    # Build data loader
+    if tag is None:
+        data_loader = torch.utils.data.DataLoader(
+            dataset_wrapper(cfg, data_s=data_s, data_q=data_q, transform_s=tfm_s, transform_q=tfm_q, is_train=is_train),
+            batch_size=batch_size,
+            sampler=sampler,
+            num_workers=cfg.DATALOADER.NUM_WORKERS,
+            drop_last=is_train and len(data_s + data_q) >= batch_size,
+            pin_memory=(torch.cuda.is_available() and cfg.USE_CUDA),
+        )
+    else:
+        data_loader = torch.utils.data.DataLoader(
+            dataset_wrapper(cfg, data_s=data_s, data_q=data_q, transform_s=tfm_s, transform_q=tfm_q, is_train=is_train),
+            batch_size=batch_size,
+            sampler=sampler,
+            num_workers=cfg.DATALOADER.NUM_WORKERS,
+            drop_last=is_train and len(data_s + data_q) >= batch_size,
+            pin_memory=(torch.cuda.is_available() and cfg.USE_CUDA),
+        )
+
+
+
+
+    return data_loader
+
 def build_data_loader(
     cfg,
     sampler_type="RandomSampler",
@@ -182,17 +239,19 @@ class UPLDataManager(DataManager):
 
         # modify datum to add label_type
 
-        transductive_loader = build_data_loader(
+        transductive_loader = build_transductive_loader(
             self.cfg,
             sampler_type="RandomSampler",
             sampler=None,
-            data_source=(self.train_x, sstrain),
+            data_s=self.train_x,
+            data_q=sstrain,
             batch_size=self.cfg.DATALOADER.TRAIN_X.BATCH_SIZE,
             n_domain=self.cfg.DATALOADER.TRAIN_X.N_DOMAIN,
             n_ins=1,
-            tfm=self.tfm_train,
+            tfm_s=self.tfm_train,
+            tfm_q=self.tfm_train,
             is_train=False,
-            dataset_wrapper=self.dataset_wrapper,
+            dataset_wrapper=None,
         )
         self.transductive_loader = transductive_loader
 
