@@ -298,8 +298,9 @@ class TransductiveDatasetWrapper(TorchDataset):
         return self.s_size + self.q_size
 
     def __getitem__(self, idx):
-        print(idx)
-        print(self.s_size, self.q_size)
+        if idx >= self.s_size + self.q_size:
+            print(idx)
+            print(self.s_size, self.q_size)
         if idx < self.s_size:
             item = self.data_s[idx]
             label_type = self.label_s
