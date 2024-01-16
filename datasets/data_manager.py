@@ -1,6 +1,9 @@
 from dassl.data import DataManager
 from dassl.data.data_manager import DatasetWrapper
-from dassl.data.transforms import build_transform
+import torchvision.transforms as T
+from torch.utils.data import Dataset as TorchDataset
+from dassl.utils import read_image
+from dassl.data.transforms import build_transform, INTERPOLATION_MODES
 from dassl.data.samplers import build_sampler
 
 from torch.utils.data import DataLoader, WeightedRandomSampler
@@ -21,9 +24,11 @@ def build_data_loader(
 ):
     # Build sample
 
-    print("DATASOURCE ==============================================================")
-    print(type(data_source))
-    print(data_source)
+    if isinstance(data_source, tuple):
+        merged = []
+        for ds in data_source:
+            merged += ds
+        data_source = merged
 
     if sampler_type is not None:
         sampler = build_sampler(
@@ -91,6 +96,7 @@ class UPLDataManager(DataManager):
         self.cfg = cfg
         self.tfm_train = tfm_train
         self.dataset_wrapper = dataset_wrapper
+        self.transductive_loader = None
 
         if cfg.DATALOADER.OPEN_SETTING:
             test_novel_loader = build_data_loader(
@@ -172,4 +178,109 @@ class UPLDataManager(DataManager):
             dataset_wrapper=self.dataset_wrapper,
         )
         self.train_loader_sstrain = train_loader_sstrain
-        
+
+        # modify datum to add label_type
+
+        transductive_loader = build_data_loader(
+            self.cfg,
+            sampler_type="RandomSampler",
+            sampler=None,
+            data_source=(self.train_x, sstrain),
+            batch_size=self.cfg.DATALOADER.TRAIN_X.BATCH_SIZE,
+            n_domain=self.cfg.DATALOADER.TRAIN_X.N_DOMAIN,
+            n_ins=1,
+            tfm=self.tfm_train,
+            is_train=False,
+            dataset_wrapper=self.dataset_wrapper,
+        )
+        self.transductive_loader = transductive_loader
+
+
+class TransductiveDatasetWrapper(TorchDataset):
+
+    def __init__(self, cfg, data_s, data_q, transform_s=None, transform_q=None, is_train=False):
+        self.cfg = cfg
+        self.data_s = data_s
+        self.data_q = data_q
+        self.s_size = len(data_s)
+        self.q_size = len(data_q)
+        self.label_s = "s"
+        self.label_q = "q"
+        self.transform_s = transform_s  # accept list (tuple) as input
+        self.transform_q = transform_q  # accept list (tuple) as input
+        self.is_train = is_train
+        # Augmenting an image K>1 times is only allowed during training
+        self.k_tfm = cfg.DATALOADER.K_TRANSFORMS if is_train else 1
+        self.return_img0 = cfg.DATALOADER.RETURN_IMG0
+
+        if self.k_tfm > 1 and (transform_s is None or transform_q is None):
+            raise ValueError(
+                "Cannot augment the image {} times "
+                "because transform for S or Q is None".format(self.k_tfm)
+            )
+
+        # Build transform that doesn't apply any data augmentation
+        interp_mode = INTERPOLATION_MODES[cfg.INPUT.INTERPOLATION]
+        to_tensor = []
+        to_tensor += [T.Resize(cfg.INPUT.SIZE, interpolation=interp_mode)]
+        to_tensor += [T.ToTensor()]
+        if "normalize" in cfg.INPUT.TRANSFORMS:
+            normalize = T.Normalize(
+                mean=cfg.INPUT.PIXEL_MEAN, std=cfg.INPUT.PIXEL_STD
+            )
+            to_tensor += [normalize]
+        self.to_tensor = T.Compose(to_tensor)
+
+    def __len__(self):
+        return self.s_size + self.q_size
+
+    def __getitem__(self, idx):
+        if idx < self.s_size:
+            item = self.data_s[idx]
+            label_type = self.label_s
+            transform = self.transform_s
+        else:
+            item = self.data_q[idx]
+            label_type = self.label_q
+            transform = self.transform_q
+
+        output = {
+            "label": item.label,
+            "domain": item.domain,
+            "impath": item.impath,
+            "index": idx,
+            "label_type": label_type
+        }
+
+        img0 = read_image(item.impath)
+
+        if transform is not None:
+            if isinstance(transform, (list, tuple)):
+                for i, tfm in enumerate(transform):
+                    img = self._transform_image(tfm, img0)
+                    keyname = "img"
+                    if (i + 1) > 1:
+                        keyname += str(i + 1)
+                    output[keyname] = img
+            else:
+                img = self._transform_image(transform, img0)
+                output["img"] = img
+        else:
+            output["img"] = img0
+
+        if self.return_img0:
+            output["img0"] = self.to_tensor(img0)  # without any augmentation
+
+        return output
+
+    def _transform_image(self, tfm, img0):
+        img_list = []
+
+        for k in range(self.k_tfm):
+            img_list.append(tfm(img0))
+
+        img = img_list
+        if len(img) == 1:
+            img = img[0]
+
+        return img

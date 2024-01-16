@@ -34,6 +34,7 @@ do
         TRAINER.UPLTrainer.CSC ${CSC} \
         TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
         DATASET.NUM_SHOTS ${SHOTS} \
+        DATASET.NUM_TRUE_SHOTS -1 \
         DATASET.CLASS_EQULE ${CLASS_EQULE} 
     fi
 done
