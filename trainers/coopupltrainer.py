@@ -144,8 +144,8 @@ class PromptLearner(nn.Module):
     def __init__(self, cfg, classnames, clip_model):
         super().__init__()
         n_cls = len(classnames)
-        n_ctx = cfg.TRAINER.UPLTrainer.N_CTX
-        ctx_init = cfg.TRAINER.UPLTrainer.CTX_INIT
+        n_ctx = cfg.TRAINER.CoOpUPLTrainer.N_CTX
+        ctx_init = cfg.TRAINER.CoOpUPLTrainer.CTX_INIT
         dtype = clip_model.dtype
         ctx_dim = clip_model.ln_final.weight.shape[0]
         clip_imsize = clip_model.visual.input_resolution
@@ -164,7 +164,7 @@ class PromptLearner(nn.Module):
 
         else:
             # random initialization
-            if cfg.TRAINER.UPLTrainer.CSC:
+            if cfg.TRAINER.CoOpUPLTrainer.CSC:
                 print("Initializing class-specific contexts")
                 ctx_vectors = torch.empty(n_cls, n_ctx, ctx_dim, dtype=dtype)
             else:
@@ -197,7 +197,7 @@ class PromptLearner(nn.Module):
         self.n_ctx = n_ctx
         self.tokenized_prompts = tokenized_prompts  # torch.Tensor
         self.name_lens = name_lens
-        self.class_token_position = cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION
+        self.class_token_position = cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION
 
     def forward(self):
         ctx = self.ctx
@@ -928,7 +928,7 @@ class CoOpUPLTrainer(TrainerX):
         save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
                                      self.cfg.DATASET.NUM_SHOTS) + '_' + self.cfg.DATASET.NUM_TRUE_SHOTS + '_random_init '
-                                    + str(self.cfg.TRAINER.UPLTrainer.CLASS_TOKEN_POSITION))
+                                    + str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
