@@ -3,7 +3,8 @@ from dassl.data.data_manager import DatasetWrapper
 import torchvision.transforms as T
 from torch.utils.data import Dataset as TorchDataset
 from dassl.utils import read_image
-from dassl.data.transforms import build_transform, INTERPOLATION_MODES
+from dassl.data.transforms import build_transform \
+from dassl.data.transforms.transforms import INTERPOLATION_MODES
 from dassl.data.samplers import build_sampler
 
 from torch.utils.data import DataLoader, WeightedRandomSampler
