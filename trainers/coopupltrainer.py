@@ -398,7 +398,8 @@ class CoOpUPLTrainer(TrainerX):
         input = batch["img"]
         label = batch["label"]
         label_type = batch["label_type"]
-
+        print(label)
+        print(label_type)
         label_type_converted = [1 if x == 's' else -1 for x in label_type]
 
         # Convert to a Torch tensor
