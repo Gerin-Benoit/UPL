@@ -13,9 +13,9 @@ NCTX=$4  # number of context tokens
 SHOTS=$5  # number of shots (1, 2, 4, 8, 16)
 CSC=$6  # class-specific context (False or True)
 CLASS_EQULE=$7  # CLASS_EQULE True of False
-TAG=$8 # log tag (multiple_models_random_init or rn50_random_init)
-LAMBDA_S=$9
-LAMBDA_Q=$10
+TAG="rn50_random_init"
+LAMBDA_S=$8
+LAMBDA_Q=$9
 
 
 for SEED in 1 # {1..3}
