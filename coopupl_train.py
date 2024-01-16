@@ -149,6 +149,7 @@ def main(args):
         
         trainer.dm.update_ssdateloader(predict_label_dict, predict_conf_dict)
         trainer.train_loader_sstrain = trainer.dm.train_loader_sstrain
+        trainer.transductive_loader = trainer.dm.transductive_loader
         trainer.sstrain_with_id(model_id=i)
 
 if __name__ == '__main__':

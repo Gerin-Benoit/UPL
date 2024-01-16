@@ -154,6 +154,7 @@ class UPLDataManager(DataManager):
         self.cfg = cfg
         self.tfm_train = tfm_train
         self.dataset_wrapper = dataset_wrapper
+        self.transductive_loader = None
 
 
         if cfg.DATALOADER.OPEN_SETTING:
@@ -253,7 +254,7 @@ class UPLDataManager(DataManager):
             is_train=False,
             dataset_wrapper=None,
         )
-        print("HERE=================================================================================")
+        print("=== Size of S, Size of Q : ===")
         print(len(self.dataset.train_x), len(sstrain))
         self.transductive_loader = transductive_loader
 
