@@ -396,10 +396,12 @@ class CoOpUPLTrainer(TrainerX):
             loss = self.lambda_s * loss_s + self.lambda_q * loss_q
             self.model_backward_and_update(loss)
 
+        loss_s_log = 0 if n_s == 0 else loss_s.item()
+        loss_q_log = 0 if n_q == 0 else loss_q.item()
         loss_summary = {
             "loss": loss.item(),
-            "loss_s": loss_s.item(),
-            "loss_q": loss_q.item(),
+            "loss_s": loss_s_log,
+            "loss_q": loss_q_log,
             "acc": compute_accuracy(output, label)[0].item(),
         }
 
@@ -950,7 +952,7 @@ class CoOpUPLTrainer(TrainerX):
         save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
                                      self.cfg.DATASET.NUM_SHOTS) + '_' + self.cfg.DATASET.NUM_TRUE_SHOTS + '_random_init '
-                                    + str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
+                                 + str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
