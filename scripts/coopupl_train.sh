@@ -14,9 +14,11 @@ SHOTS=$5  # number of shots (1, 2, 4, 8, 16)
 CSC=$6  # class-specific context (False or True)
 CLASS_EQULE=$7  # CLASS_EQULE True of False
 TAG=$8 # log tag (multiple_models_random_init or rn50_random_init)
+LAMBDA_S=$9
+LAMBDA_Q=$10
 
 
-for SEED in {1..3}
+for SEED in {1} # {1..3}
 do
     DIR=./output_transductive/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
     if [ -d "$DIR" ]; then
@@ -31,6 +33,8 @@ do
         --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
         --output-dir ${DIR} \
         --n_shots ${SHOTS} \
+        --lambda_s ${LAMBDA_S} \
+        --lambda_q ${LAMBDA_Q} \
         TRAINER.CoOpUPLTrainer.N_CTX ${NCTX} \
         TRAINER.CoOpUPLTrainer.CSC ${CSC} \
         TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
