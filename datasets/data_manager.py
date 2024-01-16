@@ -154,7 +154,7 @@ class UPLDataManager(DataManager):
         self.cfg = cfg
         self.tfm_train = tfm_train
         self.dataset_wrapper = dataset_wrapper
-        self.transductive_loader = None
+
 
         if cfg.DATALOADER.OPEN_SETTING:
             test_novel_loader = build_data_loader(
