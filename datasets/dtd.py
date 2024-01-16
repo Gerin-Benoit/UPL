@@ -92,7 +92,7 @@ class SSDescribableTextures(UPLDatasetBase):
             train, val, test = self.read_and_split_data(self.image_dir)
             OxfordPets.save_split(train, val, test, self.split_path, self.image_dir)
         sstrain = self.read_sstrain_data(self.split_path, self.image_dir)
-        num_shots = cfg.DATASET.NUM_SHOTS
-        train = self.generate_fewshot_dataset(train, num_shots=-1)
-        val = self.generate_fewshot_dataset(val, num_shots=-1)  
-        super().__init__(train_x=train, val = val, test=test, sstrain=sstrain)
+        num_shots = cfg.DATASET.NUM_TRUE_SHOTS
+        train = self.generate_fewshot_dataset(train, num_shots=num_shots, mode='train')
+        val = self.generate_fewshot_dataset(val, num_shots=min(num_shots, 4), mode='val')
+        super().__init__(train_x=train, val=val, test=test, sstrain=sstrain)

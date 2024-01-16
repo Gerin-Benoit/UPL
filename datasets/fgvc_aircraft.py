@@ -72,9 +72,9 @@ class SSFGVCAircraft(UPLDatasetBase):
         test = self.read_data(cname2lab, "images_variant_test.txt")
 
         sstrain = self.read_data_without_label(cname2lab, "images_variant_test.txt")
-        num_shots = cfg.DATASET.NUM_SHOTS
-        train = self.generate_fewshot_dataset(train, num_shots=-1)
-        val = self.generate_fewshot_dataset(val, num_shots=-1)  
+        num_shots = cfg.DATASET.NUM_TRUE_SHOTS
+        train = self.generate_fewshot_dataset(train, num_shots=num_shots, mode='train')
+        val = self.generate_fewshot_dataset(val, num_shots=min(num_shots, 4), mode='val')
         super().__init__(train_x=train, val=val, test=test, sstrain=sstrain)
     
     def read_data(self, cname2lab, split_file):

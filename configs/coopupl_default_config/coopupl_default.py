@@ -71,7 +71,8 @@ _C.DATASET.TARGET_DOMAINS = ()
 # Useful for the semi-supervised learning
 _C.DATASET.NUM_LABELED = -1
 # Number of images per class
-_C.DATASET.NUM_SHOTS = -1
+_C.DATASET.NUM_SHOTS = -1  # PL
+_C.DATASET.NUM_TRUE_SHOTS = -1  # True Shots
 # Percentage of validation data (only used for SSL datasets)
 # Set to 0 if do not want to use val data
 # Using val data for hyperparameter tuning was done in Oliver et al. 2018

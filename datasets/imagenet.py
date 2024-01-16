@@ -38,8 +38,8 @@ class SSImageNet(UPLDatasetBase):
             with open(self.preprocessed, "wb") as f:
                 pickle.dump(preprocessed, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-        num_shots = cfg.DATASET.NUM_SHOTS
-        train = self.generate_fewshot_dataset(train, num_shots=-1)
+        num_shots = cfg.DATASET.NUM_TRUE_SHOTS
+        train = self.generate_fewshot_dataset(train, num_shots=num_shots, mode='train')
 
         sstrain = self.read_sstrain_data(test)
         super().__init__(train_x=train, test=test, sstrain=sstrain)
