@@ -294,22 +294,17 @@ class TransductiveDatasetWrapper(TorchDataset):
             to_tensor += [normalize]
         self.to_tensor = T.Compose(to_tensor)
 
-        print("INIT=================")
-        print(len(self.data_s), len(self.data_q))
-
     def __len__(self):
         return self.s_size + self.q_size
 
     def __getitem__(self, idx):
-        if idx >= self.s_size + self.q_size:
-            print(idx)
-            print(self.s_size, self.q_size)
+
         if idx < self.s_size:
             item = self.data_s[idx]
             label_type = self.label_s
             transform = self.transform_s
         else:
-            item = self.data_q[idx]
+            item = self.data_q[idx-self.s_size]
             label_type = self.label_q
             transform = self.transform_q
 
