@@ -400,7 +400,7 @@ class CoOpUPLTrainer(TrainerX):
         label_type_converted = [1 if x == 's' else -1 for x in label_type]
 
         # Convert to a Torch tensor
-        label_type_tensor = torch.tensor(label_type_converted)
+        label_type = torch.tensor(label_type_converted)
 
         input = input.to(self.device)
         label = label.to(self.device)
