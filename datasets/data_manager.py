@@ -294,6 +294,9 @@ class TransductiveDatasetWrapper(TorchDataset):
             to_tensor += [normalize]
         self.to_tensor = T.Compose(to_tensor)
 
+        print("INIT=================")
+        print(len(self.data_s), len(self.data_q))
+
     def __len__(self):
         return self.s_size + self.q_size
 
