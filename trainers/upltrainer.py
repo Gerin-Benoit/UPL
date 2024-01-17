@@ -564,7 +564,7 @@ class UPLTrainer(TrainerX):
             all_cls[i] = 0
         for key in predict_label_dict.keys():
             value = predict_label_dict[key]
-            cls = torch.argmax(value[2]).item()
+            cls = np.argmax(value[2])
             all_cls[int(cls)] += 1
 
         print(all_cls)
