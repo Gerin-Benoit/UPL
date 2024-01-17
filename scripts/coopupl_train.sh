@@ -32,7 +32,7 @@ do
     --dataset-config-file configs/datasets/${DATASET}.yaml \
     --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
     --output-dir ${DIR} \
-    --resume ${DIR} \
+    # --resume ${DIR} \
     --n_shots ${SHOTS} \
     --lambda_s ${LAMBDA_S} \
     --lambda_q ${LAMBDA_Q} \
