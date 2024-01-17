@@ -262,10 +262,13 @@ class UPLDataManager(DataManager):
 class TransductiveDatasetWrapper(TorchDataset):
 
     def __init__(self, cfg, data_s, data_q, transform_s=None, transform_q=None, is_train=False):
-        if cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S == 0:
-            data_s = []
-        elif cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S == 1:
-            data_q = []
+        try:
+            if cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S == 0:
+                data_s = []
+            elif cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S == 1:
+                data_q = []
+        except:
+            pass
         self.cfg = cfg
         self.data_s = data_s
         self.data_q = data_q
