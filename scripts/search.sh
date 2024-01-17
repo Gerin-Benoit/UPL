@@ -2,7 +2,7 @@
 
 datasets=("ssdtd" "sseurosat")
 shots=(1 2 4 8 16)
-lss=(3 4 5)
+lss=(0.1 0.3 0.5 0.7 0.9)
 
 
 #datasets=("ssimagenet")
