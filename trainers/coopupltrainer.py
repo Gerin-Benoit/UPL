@@ -506,9 +506,10 @@ class CoOpUPLTrainer(TrainerX):
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path + '_search', self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
-                                     self.cfg.DATASET.NUM_SHOTS) + '_random_init' + str(
+                                     self.cfg.DATASET.NUM_TRUE_SHOTS) + '_ls' + str(self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S)
+                                 + '_lq' + str(self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q) + '_random_init' + str(
                                      self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
@@ -812,6 +813,7 @@ class CoOpUPLTrainer(TrainerX):
 
         self.before_train()
         for self.epoch in range(self.start_epoch, self.max_epoch):
+            break
             self.before_epoch()
             self.run_epoch_with_sstrain()
             self.after_epoch(model_id)
@@ -949,10 +951,12 @@ class CoOpUPLTrainer(TrainerX):
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path, self.cfg.DATASET.NAME,
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path + '_search', self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
-                                     self.cfg.DATASET.NUM_SHOTS) + '_' + self.cfg.DATASET.NUM_TRUE_SHOTS + '_random_init '
-                                 + str(self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
+                                     self.cfg.DATASET.NUM_TRUE_SHOTS) + '_ls' + str(
+                                     self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S)
+                                 + '_lq' + str(self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q) + '_random_init' + str(
+                                     self.cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
