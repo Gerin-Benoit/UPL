@@ -556,19 +556,6 @@ class UPLTrainer(TrainerX):
         print('text_features', text_features.shape)
         predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1, image_features, True)
 
-        print('HERE')
-        print(len(predict_label_dict.keys()))
-
-        all_cls = {}
-        for i in range(10):
-            all_cls[i] = 0
-        for key in predict_label_dict.keys():
-            value = predict_label_dict[key]
-            cls = value[0]
-            all_cls[int(cls)] += 1
-
-        print(all_cls)
-
 
         save_outputs(self.train_loader_sstrain, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)  # train_loader_x -> train_loader_sstrain
         caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_sstrain, trainer=self)

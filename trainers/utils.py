@@ -99,7 +99,6 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
     output_m_max = output_m_max[output_m_max_id]
     output_ori = output_ori[output_m_max_id]
     ids = (-output_m).argsort()[:, 0] # 获得每行的类别标签
-    print(ids)
     if image_features is not None:
         image_features = image_features.cpu().detach()
         image_features = image_features[output_m_max_id]
@@ -107,8 +106,6 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
     predict_label_dict = {}
     predict_conf_dict = {}
     from tqdm import tqdm
-    print('======================================')
-    print(K)
     for id in tqdm(list(set(ids.tolist()))): # 标签去重
         index = np.where(ids==id)
         conf_class = output_m_max[index] # 置信度
@@ -140,8 +137,7 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
                         img_path = './data/' + img_path.split('/data/')[1]
                     predict_label_dict[img_path] = id
                     predict_conf_dict[img_path] = conf
-    print(len(predict_conf_dict.keys()))
-    print(len(predict_label_dict.keys()))
+
     return predict_label_dict, predict_conf_dict
 
 def select_by_conf(outputs, img_paths, K=1, conf_threshold=None, is_softmax=True):
