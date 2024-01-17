@@ -33,6 +33,7 @@ TEST:
 MODEL:
   BACKBONE:
     NAME: "ViT-L/14"
+  PSEUDO_LABEL_MODELS: ['VIT-L-14']
   
 TRAINER:
   UPLTrainer:
