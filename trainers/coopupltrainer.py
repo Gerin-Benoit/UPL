@@ -638,6 +638,7 @@ class CoOpUPLTrainer(TrainerX):
             sstrain_img_paths = np.array(items)[:, 0]
 
         logits /= len(model_names)
+        print(logits.shape)
         predict_label_dict, predict_conf_dict = select_top_k_similarity_per_class(logits, sstrain_img_paths,
                                                                                   K=self.cfg.DATASET.NUM_SHOTS,
                                                                                   is_softmax=False)
