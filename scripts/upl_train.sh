@@ -19,24 +19,22 @@ TAG=$8 # log tag (multiple_models_random_init or rn50_random_init)
 for SEED in {1..3}
 do
     DIR=./output/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
-    if [ -d "$DIR" ]; then
-        echo "Results are available in ${DIR}. Skip this job"
-    else
-        echo "Run this job and save the output to ${DIR}"
-        python upl_train.py \
-        --root ${DATA} \
-        --seed ${SEED} \
-        --trainer ${TRAINER} \
-        --dataset-config-file configs/datasets/${DATASET}.yaml \
-        --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
-        --output-dir ${DIR} \
-        TRAINER.UPLTrainer.N_CTX ${NCTX} \
-        TRAINER.UPLTrainer.CSC ${CSC} \
-        TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
-        DATASET.NUM_SHOTS ${SHOTS} \
-        DATASET.NUM_TRUE_SHOTS -1 \
-        DATASET.CLASS_EQULE ${CLASS_EQULE} 
-    fi
+
+    echo "Run this job and save the output to ${DIR}"
+    python upl_train.py \
+    --root ${DATA} \
+    --seed ${SEED} \
+    --trainer ${TRAINER} \
+    --dataset-config-file configs/datasets/${DATASET}.yaml \
+    --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
+    --output-dir ${DIR} \
+    TRAINER.UPLTrainer.N_CTX ${NCTX} \
+    TRAINER.UPLTrainer.CSC ${CSC} \
+    TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
+    DATASET.NUM_SHOTS ${SHOTS} \
+    DATASET.NUM_TRUE_SHOTS -1 \
+    DATASET.CLASS_EQULE ${CLASS_EQULE}
+
 done
 
 
