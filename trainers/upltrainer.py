@@ -558,7 +558,17 @@ class UPLTrainer(TrainerX):
 
         print('HERE')
         print(len(predict_label_dict.keys()))
-        print(predict_label_dict.values())
+
+        all_cls = {}
+        for i in range(47):
+            all_cls[i] = 0
+        for key in predict_label_dict.keys():
+            value = predict_label_dict[key]
+            cls = torch.argmax(value[2]).item()
+            all_cls[int(cls)] += 1
+
+        print(all_cls)
+
 
         save_outputs(self.train_loader_sstrain, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)  # train_loader_x -> train_loader_sstrain
         caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_sstrain, trainer=self)
