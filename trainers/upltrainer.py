@@ -564,8 +564,7 @@ class UPLTrainer(TrainerX):
             all_cls[i] = 0
         for key in predict_label_dict.keys():
             value = predict_label_dict[key]
-            print(value[0])
-            cls = np.argmax(value[2])
+            cls = value[0]
             all_cls[int(cls)] += 1
 
         print(all_cls)
