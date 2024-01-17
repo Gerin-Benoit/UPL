@@ -94,8 +94,8 @@ def extend_cfg(cfg, args):
     cfg.TRAINER.CoOpUPLTrainer.CTX_INIT = ""  # initialization words
     cfg.TRAINER.CoOpUPLTrainer.PREC = "fp16"  # fp16, fp32, amp
     cfg.TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION = "end"  # 'middle' or 'end' or 'front'
-    if args.lamda_s < 0 or args.lamda_s > 1:
-        print("INVALID VALUE FOR LAMBDA_S ({})".format(args.lamda_s))
+    if args.lambda_s < 0 or args.lambda_s > 1:
+        print("INVALID VALUE FOR LAMBDA_S ({})".format(args.lambda_s))
         exit(-1)
     cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S = args.lambda_s
     cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q = 1 - args.lambda_s
