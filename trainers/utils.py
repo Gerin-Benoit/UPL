@@ -99,12 +99,10 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
     output_m_max = output_m_max[output_m_max_id]
     output_ori = output_ori[output_m_max_id]
     ids = (-output_m).argsort()[:, 0] # 获得每行的类别标签
-
+    print(image_features)
     if image_features is not None:
         image_features = image_features.cpu().detach()
-        print(image_features.shappe)
         image_features = image_features[output_m_max_id]
-        print(image_features.shappe)
 
     predict_label_dict = {}
     predict_conf_dict = {}
