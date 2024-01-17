@@ -560,7 +560,7 @@ class UPLTrainer(TrainerX):
         print(len(predict_label_dict.keys()))
 
         all_cls = {}
-        for i in range(47):
+        for i in range(10):
             all_cls[i] = 0
         for key in predict_label_dict.keys():
             value = predict_label_dict[key]
