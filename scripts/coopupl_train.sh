@@ -20,7 +20,7 @@ LAMBDA_Q=$9
 
 for SEED in 1 # {1..3}
 do
-    DIR=./output_transductive/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_ls${LAMBDA_S}_lq${LAMBDA_Q}_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
+    DIR=./output_transductive/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_ls${LAMBDA_S}_lqA_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
     #if [ -d "$DIR" ]; then
     #    echo "Results are available in ${DIR}. Skip this job"
     #else

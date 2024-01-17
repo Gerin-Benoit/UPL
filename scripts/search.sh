@@ -10,7 +10,7 @@ lss=(0.1 0.3 0.5 0.7 0.9)
 for dataset in "${datasets[@]}"; do
   for shot in "${shots[@]}"; do
     for ls in "${lss[@]}"; do
-      CUDA_VISIBLE_DEVICES=2 bash coopupl_train.sh "$dataset" rn50_ep50 end 16 "$shot" False True "$ls" "$(echo "scale=2; 1 - $ls" | bc | awk '{printf "%f", $0}')"
+      CUDA_VISIBLE_DEVICES=2 bash coopupl_train.sh "$dataset" rn50_ep50 end 16 "$shot" False True "$ls" 1
 
       done
   done
