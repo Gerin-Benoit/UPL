@@ -613,7 +613,7 @@ class CoOpUPLTrainer(TrainerX):
         predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1,
                                                                   image_features, True)
         print(len(predict_label_dict.keys()))
-        print(predict_label_dict.values())
+        print('HERE')
         save_outputs(self.train_loader_x, self, predict_label_dict, self.cfg.DATASET.NAME, text_features,
                      backbone_name=self.cfg.MODEL.BACKBONE.NAME)
         caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_x, trainer=self)
