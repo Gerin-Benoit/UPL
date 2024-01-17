@@ -4,11 +4,11 @@ datasets=("sscaltech101" "ssdtd" "sseurosat" "ssfgvc_aircraft" "ssfood101" "ssox
 
 
 for dataset in "${datasets[@]}"; do
-  CUDA_VISIBLE_DEVICES=1 bash get_info.sh "$dataset" anay_ViT_B_32 end 16 -1 False
+  CUDA_VISIBLE_DEVICES=0 bash get_info.sh "$dataset" anay_ViT_B_32 end 16 -1 False
 done
 
 for dataset in "${datasets[@]}"; do
-  CUDA_VISIBLE_DEVICES=1 bash upl_train.sh "$dataset" anay_ViT_B_32 end 16 16 False True ViT_B_16_random_init > ~/train_logs_ViTB32_$dataset.txt
+  CUDA_VISIBLE_DEVICES=0 bash upl_train.sh "$dataset" anay_ViT_B_32 end 16 16 False True ViT_B_16_random_init > ~/train_logs_ViTB32_$dataset.txt
 done
 
 for dataset in "${datasets[@]}"; do
