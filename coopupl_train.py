@@ -72,6 +72,8 @@ def reset_cfg(cfg, args):
     if args.n_shots:
         cfg.DATASET.NUM_TRUE_SHOTS = args.n_shots
 
+    cfg.DATASET.NUM_SHOTS = 16
+
 
 def extend_cfg(cfg, args):
     """
