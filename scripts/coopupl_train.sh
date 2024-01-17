@@ -21,27 +21,27 @@ LAMBDA_Q=$9
 for SEED in 1 # {1..3}
 do
     DIR=./output_transductive/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_ls${LAMBDA_S}_lq${LAMBDA_Q}_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
-    if [ -d "$DIR" ]; then
-        echo "Results are available in ${DIR}. Skip this job"
-    else
-        echo "Run this job and save the output to ${DIR}"
-        python coopupl_train.py \
-        --root ${DATA} \
-        --seed ${SEED} \
-        --trainer ${TRAINER} \
-        --dataset-config-file configs/datasets/${DATASET}.yaml \
-        --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
-        --output-dir ${DIR} \
-        --resume ${DIR} \
-        --n_shots ${SHOTS} \
-        --lambda_s ${LAMBDA_S} \
-        --lambda_q ${LAMBDA_Q} \
-        TRAINER.CoOpUPLTrainer.N_CTX ${NCTX} \
-        TRAINER.CoOpUPLTrainer.CSC ${CSC} \
-        TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
-        DATASET.NUM_SHOTS 16 \
-        DATASET.CLASS_EQULE ${CLASS_EQULE} 
-    fi
+    #if [ -d "$DIR" ]; then
+    #    echo "Results are available in ${DIR}. Skip this job"
+    #else
+    echo "Run this job and save the output to ${DIR}"
+    python coopupl_train.py \
+    --root ${DATA} \
+    --seed ${SEED} \
+    --trainer ${TRAINER} \
+    --dataset-config-file configs/datasets/${DATASET}.yaml \
+    --config-file configs/trainers/${TRAINER}/${CFG}.yaml \
+    --output-dir ${DIR} \
+    --resume ${DIR} \
+    --n_shots ${SHOTS} \
+    --lambda_s ${LAMBDA_S} \
+    --lambda_q ${LAMBDA_Q} \
+    TRAINER.CoOpUPLTrainer.N_CTX ${NCTX} \
+    TRAINER.CoOpUPLTrainer.CSC ${CSC} \
+    TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
+    DATASET.NUM_SHOTS 16 \
+    DATASET.CLASS_EQULE ${CLASS_EQULE}
+    #fi
 done
 
 
