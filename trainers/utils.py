@@ -102,7 +102,9 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
 
     if image_features is not None:
         image_features = image_features.cpu().detach()
+        print(image_features.shappe)
         image_features = image_features[output_m_max_id]
+        print(image_features.shappe)
 
     predict_label_dict = {}
     predict_conf_dict = {}
@@ -116,7 +118,6 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
         img_paths_class = img_paths[index] # 每个类别的路径
 
         if image_features is not None:
-            print("111111111111")
             img_features = image_features[index]
             if K >= 0:
                 for img_path, img_feature, conf, logit in zip(img_paths_class[:K], img_features[:K], conf_class[:K], output_class):
@@ -129,7 +130,6 @@ def select_top_k_similarity_per_class(outputs, img_paths, K=1, image_features=No
                         img_path = './data/' + img_path.split('/data/')[1]
                     predict_label_dict[img_path] = [id, img_feature, conf, logit]
         else:
-            print("2222222222")
             if K >= 0:
                 for img_path, conf in zip(img_paths_class[:K], conf_class):
                     if '/data/' in img_path:
