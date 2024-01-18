@@ -506,7 +506,7 @@ class CoOpUPLTrainer(TrainerX):
         self.set_model_mode("eval")
         self.evaluator.reset()
 
-        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path + '_search', self.cfg.DATASET.NAME,
+        save_path = os.path.join(self.cfg.TEST.Analyze_Result_Path + '_validation', self.cfg.DATASET.NAME,
                                  str(self.cfg.OPTIM.MAX_EPOCH) + '_' + str(self.cfg.SEED) + '_' + str(
                                      self.cfg.DATASET.NUM_TRUE_SHOTS) + '_ls' + str(self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_S)
                                  + '_lq' + str(self.cfg.TRAINER.CoOpUPLTrainer.LAMBDA_Q) + '_random_init' + str(
@@ -910,8 +910,10 @@ class CoOpUPLTrainer(TrainerX):
                 self.load_model_by_id(self.output_dir, model_id)
             # self.test(split='novel')
             # self.test(split='base')
-            # self.test(split='train')
+            curr_res = self.test(split='val')
             self.test(split='test')
+            print("Validation accuracy: {}".format(curr_res["perclass_accuracy"]))
+
 
         # Show elapsed time
         elapsed = round(time.time() - self.time_start)
