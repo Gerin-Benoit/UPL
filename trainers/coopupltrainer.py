@@ -912,7 +912,7 @@ class CoOpUPLTrainer(TrainerX):
             # self.test(split='base')
             curr_res = self.test(split='val')
             self.test(split='test')
-            print("Validation accuracy: {}".format(curr_res["perclass_accuracy"]))
+            print("Validation accuracy: {}".format(curr_res))
 
 
         # Show elapsed time
