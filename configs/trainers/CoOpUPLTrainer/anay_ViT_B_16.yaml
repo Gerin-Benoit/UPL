@@ -33,7 +33,9 @@ TEST:
 MODEL:
   BACKBONE:
     NAME: "ViT-B/16"
-  
+  PSEUDO_LABEL_MODELS: [ 'ViT-B-16' ]
+
+
 TRAINER:
-  UPLTrainer:
+  CoOpUPLTrainer:
     CTX_INIT: "a photo of a"
