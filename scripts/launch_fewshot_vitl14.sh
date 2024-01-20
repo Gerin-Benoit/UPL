@@ -8,7 +8,7 @@ seeds=(1 2 3)
 for dataset in "${datasets[@]}"; do
   for shot in "${shots[@]}"; do
     for seed in "${seeds[@]}"; do
-      CUDA_VISIBLE_DEVICES=3 bash coopupl_train_and_val_vitl14.sh "$dataset" anay_ViT_L_14 end 16 "$shot" False True "$seed" > ~/trainval_logs/vitl14_"$dataset"_"$shot"shots_seed"$seed".txt
+      CUDA_VISIBLE_DEVICES=0 bash coopupl_train_and_val_vitl14.sh "$dataset" anay_ViT_L_14 end 16 "$shot" False True "$seed" > ~/trainval_logs/vitl14_"$dataset"_"$shot"shots_seed"$seed".txt
     done
   done
 done
