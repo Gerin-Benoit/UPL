@@ -8,7 +8,7 @@ datasets=("sscaltech101" "ssdtd" "sseurosat" "ssfgvc_aircraft" "ssfood101" "ssox
 #done
 
 for dataset in "${datasets[@]}"; do
-  bash upl_train.sh "$dataset" anay_ViT_B_32 end 16 16 False True ViT_B_32_random_init > ~/train_logs_ViTB32_$dataset.txt
+  bash upl_train.sh "$dataset" anay_ViT_B_32 end 16 16 False True ViT_B_32_random_init > ~/random_init/train_logs_ViTB32_$dataset.txt
 done
 
 #for dataset in "${datasets[@]}"; do
