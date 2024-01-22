@@ -105,12 +105,6 @@ def setup_cfg(args):
 
     cfg = get_cfg_default()
 
-    if args.dataset == "ssimagenet":
-        cfg.OPTIM.MAX_EPOCH = 50
-    else:
-        epoch_mapping = {0: 50, 1: 50, 2: 100, 4: 100, 8: 200, 16: 200}
-        n_epochs = epoch_mapping[args.n_shots]
-        cfg.OPTIM.MAX_EPOCH = n_epochs
 
     extend_cfg(cfg, args)
 
@@ -131,6 +125,13 @@ def setup_cfg(args):
 
     # 4. From optional input arguments
     cfg.merge_from_list(args.opts)
+
+    if args.dataset == "ssimagenet":
+        cfg.OPTIM.MAX_EPOCH = 50
+    else:
+        epoch_mapping = {0: 50, 1: 50, 2: 100, 4: 100, 8: 200, 16: 200}
+        n_epochs = epoch_mapping[args.n_shots]
+        cfg.OPTIM.MAX_EPOCH = n_epochs
 
     cfg.freeze()
 
