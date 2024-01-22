@@ -120,6 +120,9 @@ def setup_cfg(args):
 
 
 def main(args):
+    print("===========================")
+    print(torch.cuda.is_available())
+    print("===========================")
     cfg = setup_cfg(args)
     if cfg.SEED >= 0:
         print('Setting fixed seed: {}'.format(cfg.SEED))
