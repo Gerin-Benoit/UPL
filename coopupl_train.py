@@ -102,7 +102,16 @@ def extend_cfg(cfg, args):
     # cfg.DATASET.NUM_TRUE_SHOTS = args.n_shots
 
 def setup_cfg(args):
+
     cfg = get_cfg_default()
+
+    if args.dataset == "ssimagenet":
+        cfg.OPTIM.MAX_EPOCH = 50
+    else:
+        epoch_mapping = {0: 50, 1: 50, 2: 100, 4: 100, 8: 200, 16: 200}
+        n_epochs = epoch_mapping[args.n_shots]
+        cfg.OPTIM.MAX_EPOCH = n_epochs
+
     extend_cfg(cfg, args)
 
     # 1. From the dataset config file
@@ -129,6 +138,9 @@ def setup_cfg(args):
 
 
 def main(args):
+
+
+
     cfg = setup_cfg(args)
     if cfg.SEED >= 0:
         print('Setting fixed seed: {}'.format(cfg.SEED))
@@ -198,6 +210,10 @@ if __name__ == '__main__':
         type=str,
         default='',
         help='path to config file for dataset setup'
+    )
+    parser.add_argument(
+        '--dataset',
+        type=str,
     )
     parser.add_argument(
         '--hh-config-file', type=str, default='', help='path to config file'
