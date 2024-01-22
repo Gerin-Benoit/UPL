@@ -35,6 +35,3 @@ MODEL:
     NAME: "ViT-L/14"
   PSEUDO_LABEL_MODELS: ['ViT-L-14']
 
-TRAINER:
-  UPLTrainer:
-    CTX_INIT: "a photo of a"
