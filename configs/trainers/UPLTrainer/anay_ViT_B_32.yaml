@@ -34,6 +34,3 @@ MODEL:
   BACKBONE:
     NAME: "ViT-B/32"
   PSEUDO_LABEL_MODELS: ['ViT-B-32']
-  
-TRAINER:
-  UPLTrainer:
