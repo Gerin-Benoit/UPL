@@ -34,7 +34,3 @@ MODEL:
   BACKBONE:
     NAME: "RN101"
   PSEUDO_LABEL_MODELS: ['RN101']
-  
-TRAINER:
-  CoOpUPLTrainer:
-    CTX_INIT: "a photo of a"

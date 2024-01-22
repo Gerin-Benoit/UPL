@@ -35,7 +35,3 @@ MODEL:
     NAME: "ViT-B/16"
   PSEUDO_LABEL_MODELS: [ 'ViT-B-16' ]
 
-
-TRAINER:
-  CoOpUPLTrainer:
-    CTX_INIT: "a photo of a"

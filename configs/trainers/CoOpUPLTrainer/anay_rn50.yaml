@@ -33,7 +33,3 @@ TEST:
 MODEL:
   BACKBONE:
     NAME: "RN50"
-  
-TRAINER:
-  UPLTrainer:
-    CTX_INIT: "a photo of a"
