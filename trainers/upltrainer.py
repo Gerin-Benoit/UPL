@@ -71,6 +71,14 @@ CUSTOM_TEMPLATES = {
     "SSImageNetR": "a photo of a {}.",
 }
 
+imagenet_templates = ["itap of a {}.",
+                        "a bad photo of the {}.",
+                        "a origami {}.",
+                        "a photo of the large {}.",
+                        "a {} in a video game.",
+                        "art of the {}.",
+                        "a photo of the small {}."]
+
 
 def load_clip_to_cpu(cfg):
     backbone_name = cfg.MODEL.BACKBONE.NAME
@@ -283,6 +291,23 @@ class CustomCLIP(nn.Module):
         logit_scale = self.clip.logit_scale.exp()
         logits = logit_scale * image_features @ text_features.t()
         return logits, image_features, text_features
+
+    def zero_shot_forward_TEMPLATES(self, image, device):
+        prompts = [[temp.format(c.replace("_", " ")) for temp in imagenet_templates] for c in self.classnames]
+        prompts = torch.cat([clip.tokenize(p) for p in prompts])
+        prompts = prompts.to(device)
+
+        with torch.no_grad():
+            text_features = self.clip.encode_text(prompts)
+            text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+
+        image_features = self.clip.encode_image(image)
+        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+        logit_scale = self.clip.logit_scale.exp()
+        logits = logit_scale * image_features @ text_features.t()
+        return logits, image_features, text_features
+
+
 
 
 
