@@ -293,7 +293,7 @@ class CustomCLIP(nn.Module):
         logits = logit_scale * image_features @ text_features.t()
         return logits, image_features, text_features
 
-    def comp_clasfeatures(self):
+    def comp_clasfeatures(self, device):
         classes_features = []
         with torch.no_grad():
             for classname in self.classnames:
@@ -313,7 +313,7 @@ class CustomCLIP(nn.Module):
 
     def zero_shot_forward_TEMPLATES(self, image, device):
         if not self.is_init:
-            self.comp_clasfeatures()
+            self.comp_clasfeatures(device)
 
         with torch.no_grad():
 
