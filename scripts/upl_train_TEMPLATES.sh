@@ -21,7 +21,7 @@ do
     DIR=./output_TEMPLATES/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
 
     echo "Run this job and save the output to ${DIR}"
-    python upl_train.py \
+    python upl_train_TEMPLATES.py \
     --root ${DATA} \
     --seed ${SEED} \
     --trainer ${TRAINER} \
