@@ -56,10 +56,10 @@ def compute_mean_accuracies(folder_path):
     return mean_accuracies
 
 
-output_file_path = 'mean_accuracies_summary.txt'
+output_file_path = 'fewshot_mean_accuracies_summary.txt'
 
 # Usage
-folder_path = '/home/gerinb/logs/trainval_logs'
+folder_path = '/home/gerinb/logs/lucia_fw_logs'
 mean_accuracies = compute_mean_accuracies(folder_path)
 
 # Sort mean_accuracies by arch, dataset, and n_shots for printing

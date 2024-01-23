@@ -287,7 +287,7 @@ def caculate_noise_rate_analyze(predict_label_dict, train_loader, trainer, sampl
     print('Acc Rate {:.4f}'.format(correct/total))
 
 
-def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_features, backbone_name=None):
+def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_features, backbone_name=None, specific_folder=None):
     backbone_name = backbone_name.replace('/', '-')
     gt_pred_label_dict = {}
 
@@ -339,17 +339,27 @@ def save_outputs(train_loader, trainer, predict_label_dict, dataset_name, text_f
 
     v_features = torch.vstack(v_features)
     logits_tensor = torch.vstack(logits_list)
+    if specific_folder is None:
+        if not os.path.exists('./analyze_results/{}/'.format(backbone_name)):
+            os.makedirs('./analyze_results/{}/'.format(backbone_name))
 
-    if not os.path.exists('./analyze_results/{}/'.format(backbone_name)):
-        os.makedirs('./analyze_results/{}/'.format(backbone_name))
-    
-    torch.save(v_features, './analyze_results/{}/{}_v_feature.pt'.format(backbone_name, dataset_name))
-    torch.save(text_features, './analyze_results/{}/{}_l_feature.pt'.format(backbone_name, dataset_name))
-    torch.save(logits_tensor, './analyze_results/{}/{}_logits.pt'.format(backbone_name, dataset_name))
-    
-    
-    with open("./analyze_results/{}/{}.json".format(backbone_name, dataset_name), "w") as outfile:
-        json.dump(v_distance_dict, outfile)
+        torch.save(v_features, './analyze_results/{}/{}_v_feature.pt'.format(backbone_name, dataset_name))
+        torch.save(text_features, './analyze_results/{}/{}_l_feature.pt'.format(backbone_name, dataset_name))
+        torch.save(logits_tensor, './analyze_results/{}/{}_logits.pt'.format(backbone_name, dataset_name))
+
+
+        with open("./analyze_results/{}/{}.json".format(backbone_name, dataset_name), "w") as outfile:
+            json.dump(v_distance_dict, outfile)
+    else:
+        if not os.path.exists('./{}/{}/'.format(specific_folder, backbone_name)):
+            os.makedirs('./{}/{}/'.format(specific_folder, backbone_name))
+
+        torch.save(v_features, './{}/{}/{}_v_feature.pt'.format(specific_folder, backbone_name, dataset_name))
+        torch.save(text_features, './{}/{}/{}_l_feature.pt'.format(specific_folder, backbone_name, dataset_name))
+        torch.save(logits_tensor, './{}/{}/{}_logits.pt'.format(specific_folder, backbone_name, dataset_name))
+
+        with open("./{}/{}/{}.json".format(specific_folder, backbone_name, dataset_name), "w") as outfile:
+            json.dump(v_distance_dict, outfile)
 
 
 def select_top_k_similarity_per_class_with_high_conf(outputs, img_paths, K=1, image_features=None, repeat=False):

@@ -293,19 +293,27 @@ class CustomCLIP(nn.Module):
         return logits, image_features, text_features
 
     def zero_shot_forward_TEMPLATES(self, image, device):
-        prompts = [[temp.format(c.replace("_", " ")) for temp in imagenet_templates] for c in self.classnames]
-        prompts = torch.cat([clip.tokenize(p) for p in prompts])
-        prompts = prompts.to(device)
 
+        classes_features = []
         with torch.no_grad():
-            text_features = self.clip.encode_text(prompts)
-            text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+            for classname in self.classname:
+                classname = classname.replace("_", " ")
+                prompts = [temp.format(classname) for temp in imagenet_templates]
+                prompts = torch.cat([clip.tokenize(p) for p in prompts])
+                prompts = prompts.to(device)
 
-        image_features = self.clip.encode_image(image)
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        logit_scale = self.clip.logit_scale.exp()
-        logits = logit_scale * image_features @ text_features.t()
-        return logits, image_features, text_features
+                text_features = self.clip.encode_text(prompts)
+                text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+                text_features = text_features.mean(dim=0)
+                text_features = text_features / text_features.norm()
+                classes_features.append(text_features)
+
+            classes_features = torch.stack(classes_features, dim=-1).cuda()
+            image_features = self.clip.encode_image(image)
+            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+            logit_scale = self.clip.logit_scale.exp()
+            logits = logit_scale * image_features @ classes_features.t()
+        return logits, image_features, classes_features
 
 
 
@@ -583,6 +591,47 @@ class UPLTrainer(TrainerX):
 
 
         save_outputs(self.train_loader_sstrain, self, predict_label_dict, self.cfg.DATASET.NAME, text_features, backbone_name=self.cfg.MODEL.BACKBONE.NAME)  # train_loader_x -> train_loader_sstrain
+        caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_sstrain, trainer=self)
+        return predict_label_dict
+
+    @torch.no_grad()
+    def zero_shot_analyze_TEMPLATES(self, trainer_list=None):
+        """A generic predicting pipeline."""
+        self.set_model_mode("eval")
+        self.model.eval()
+        self.evaluator.reset()
+
+        data_loader = self.train_loader_sstrain
+        outputs = []
+        image_features_list = []
+        img_paths = []
+        from tqdm import tqdm
+        print(f'COMPUTE FEATURES FOR {len(data_loader)} batches with multiple prompts')
+        for batch_idx, batch in enumerate(tqdm(data_loader, desc="Processing", unit="batch")):
+            input, label, impath = self.parse_batch_test_with_impath(batch)
+
+            if trainer_list is None or len(trainer_list) == 1:
+                # 如果不是ensemble的测试
+                output, image_features, text_features = self.model.zero_shot_forward_TEMPLATES(input, self.device)
+            else:
+                # ensemble的测试
+                outputs = [t.model.zero_shot_forward(input, self.device)[0] for t in trainer_list]
+                output = sum(outputs) / len(outputs)
+            outputs.append(output)
+            image_features_list.append(image_features)
+            img_paths.append(impath)
+
+        sstrain_outputs = torch.cat(outputs, dim=0)
+        sstrain_img_paths = np.concatenate(img_paths, axis=0)
+        image_features = torch.cat(image_features_list, axis=0)
+        # text_features = torch.cat(text_features, axis=0)
+        print('image_features', image_features.shape)
+        print('text_features', text_features.shape)
+        predict_label_dict, _ = select_top_k_similarity_per_class(sstrain_outputs, sstrain_img_paths, -1,
+                                                                  image_features, True)
+
+        save_outputs(self.train_loader_sstrain, self, predict_label_dict, self.cfg.DATASET.NAME, text_features,
+                     backbone_name=self.cfg.MODEL.BACKBONE.NAME, specific_folder='analyze_results_TEMPLATES')  # train_loader_x -> train_loader_sstrain
         caculate_noise_rate_analyze(predict_label_dict, train_loader=self.train_loader_sstrain, trainer=self)
         return predict_label_dict
 
