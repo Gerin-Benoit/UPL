@@ -321,7 +321,7 @@ class CustomCLIP(nn.Module):
             image_features = image_features / image_features.norm(dim=-1, keepdim=True)
             logit_scale = self.clip.logit_scale.exp()
             logits = logit_scale * image_features @ self.classes_features #.t()
-        return logits, image_features, classes_features
+        return logits, image_features, self.classes_features
 
 
 
