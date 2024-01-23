@@ -259,6 +259,7 @@ class CustomCLIP(nn.Module):
         self.clip = clip_model
         self.classnames = classnames
         self.cfg = cfg
+        self.is_init = False
 
     def forward(self, image):
         image_features = self.image_encoder(image.type(self.dtype))
@@ -292,8 +293,7 @@ class CustomCLIP(nn.Module):
         logits = logit_scale * image_features @ text_features.t()
         return logits, image_features, text_features
 
-    def zero_shot_forward_TEMPLATES(self, image, device):
-
+    def comp_clasfeatures(self):
         classes_features = []
         with torch.no_grad():
             for classname in self.classnames:
@@ -308,11 +308,19 @@ class CustomCLIP(nn.Module):
                 text_features = text_features / text_features.norm()
                 classes_features.append(text_features)
 
-            classes_features = torch.stack(classes_features, dim=-1).cuda()
+            self.classes_features = torch.stack(classes_features, dim=-1).cuda()
+            self.is_init = True
+
+    def zero_shot_forward_TEMPLATES(self, image, device):
+        if not self.is_init:
+            self.comp_clasfeatures()
+
+        with torch.no_grad():
+
             image_features = self.clip.encode_image(image)
             image_features = image_features / image_features.norm(dim=-1, keepdim=True)
             logit_scale = self.clip.logit_scale.exp()
-            logits = logit_scale * image_features @ classes_features #.t()
+            logits = logit_scale * image_features @ self.classes_features #.t()
         return logits, image_features, classes_features
 
 
