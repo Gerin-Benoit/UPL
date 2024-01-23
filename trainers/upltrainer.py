@@ -296,7 +296,7 @@ class CustomCLIP(nn.Module):
 
         classes_features = []
         with torch.no_grad():
-            for classname in self.classname:
+            for classname in self.classnames:
                 classname = classname.replace("_", " ")
                 prompts = [temp.format(classname) for temp in imagenet_templates]
                 prompts = torch.cat([clip.tokenize(p) for p in prompts])
