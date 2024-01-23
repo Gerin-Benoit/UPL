@@ -307,15 +307,12 @@ class CustomCLIP(nn.Module):
                 text_features = text_features.mean(dim=0)
                 text_features = text_features / text_features.norm()
                 classes_features.append(text_features)
-            print(classes_features[0].shape)
 
             classes_features = torch.stack(classes_features, dim=-1).cuda()
-            print(classes_features.shape)
             image_features = self.clip.encode_image(image)
             image_features = image_features / image_features.norm(dim=-1, keepdim=True)
             logit_scale = self.clip.logit_scale.exp()
-            print(image_features.shape)
-            logits = logit_scale * image_features @ classes_features.t()
+            logits = logit_scale * image_features @ classes_features #.t()
         return logits, image_features, classes_features
 
 
