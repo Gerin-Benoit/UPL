@@ -18,8 +18,8 @@ for filename in os.listdir(folder_path):
     match = filename_pattern.match(filename)
     if match:
         arch, dataset = match.groups()
-        if dataset.startswith("ssimagenet"):
-            continue
+        #if dataset.startswith("ssimagenet"):
+        #    continue
         filepath = os.path.join(folder_path, filename)
         accuracies = []
 
