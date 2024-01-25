@@ -1,7 +1,7 @@
 #!/bin/bash
 
 datasets=("ssimagenet-a" "ssimagenet-r" "ssimagenet-sketch" "ssimagenet-v2")
-archs=("anay_rn50") # "anay_ViT_B_16")
+archs=("rn50_ep50") # "anay_ViT_B_16")
 
 for arch in "${archs[@]}"; do
   for dataset in "${datasets[@]}"; do
