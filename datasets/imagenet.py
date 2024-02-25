@@ -19,7 +19,7 @@ class SSImageNet(UPLDatasetBase):
         self.dataset_dir = os.path.join(root, self.dataset_dir)
         # self.image_dir = os.path.join(self.dataset_dir, "images")
         self.preprocessed = os.path.join(self.dataset_dir, "preprocessed.pkl")
-        self.img_dir = []
+        self.img_dir = os.path.join(root, self.dataset_dir)
 
         if os.path.exists(self.preprocessed):
             with open(self.preprocessed, "rb") as f:
