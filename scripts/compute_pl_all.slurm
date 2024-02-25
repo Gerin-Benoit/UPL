@@ -33,5 +33,5 @@ module load Python/3.9.16-el8
 source ~/.venv/dassl/bin/activate
 
 
-bash get_info.sh "$dataset" "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_"$dataset".txt
+bash get_info_TEMPLATES.sh "$dataset" "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_"$dataset".txt
 
