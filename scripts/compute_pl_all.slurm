@@ -28,7 +28,7 @@ dataset=${datasets[$dataset_idx]}
 arch=${archs[arch_idx]}
 
 module purge
-module load CUDA/11.7.0
+module load nvidia/cuda/11.7.0-515.43.04
 module load devel/python/3.9.13
 source ~/.venv/dassl/bin/activate
 
