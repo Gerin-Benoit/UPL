@@ -29,7 +29,7 @@ arch=${archs[arch_idx]}
 
 module purge
 module load CUDA/11.7.0
-module load Python/3.9.16-el8
+module load devel/python/3.9.13
 source ~/.venv/dassl/bin/activate
 
 
