@@ -22,7 +22,6 @@ archs=("anay_rn101" "anay_ViT_B_32" "anay_ViT_L_14")
 index=$SLURM_ARRAY_TASK_ID
 arch_idx=$(( index ))
 
-dataset=${datasets[$dataset_idx]}
 arch=${archs[arch_idx]}
 
 module purge
