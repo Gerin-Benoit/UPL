@@ -9,18 +9,20 @@
 #SBATCH --mem=60G
 #SBATCH --gpus=1
 #SBATCH --time=4:00:00
-#SBATCH --array=0-2%3
+#SBATCH --array=0-14%15
 
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
 
-datasets=("ssimagenet")
+datasets=("ssimagenet-a" "ssimagenet-r" "ssimagenet-sketch" "ssimagenet-v2" "ssimagenet")
 archs=("anay_rn101" "anay_ViT_B_32" "anay_ViT_L_14")
 
 
 index=$SLURM_ARRAY_TASK_ID
-arch_idx=$(( index ))
+dataset_idx=$(( index / 3 ))
+temp=$(( index % 3 ))
+arch_idx=$(( temp ))
 
 dataset=${datasets[$dataset_idx]}
 arch=${archs[arch_idx]}
@@ -31,5 +33,5 @@ module load devel/python/3.9.13
 source ~/.venv/dassl/bin/activate
 
 
-bash get_info.sh ssimagenet "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_"$dataset".txt
+bash get_info_TEMPLATES.sh "$dataset" "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_"$dataset"_TEMPLATES.txt
 
