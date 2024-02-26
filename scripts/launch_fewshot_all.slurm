@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=fs_all_finegrained
+#SBATCH --job-name=fs_imagenet
 #SBATCH --output=/gpfs/home/acad/ucl-elen/gerinb/slurm/logs/%j_%x.out
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
