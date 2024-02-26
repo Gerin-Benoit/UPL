@@ -24,9 +24,12 @@ arch_idx=$(( index ))
 arch=${archs[arch_idx]}
 
 module purge
-module load nvidia/cuda/11.7.0-515.43.04
 module load devel/python/3.9.13
+module load nvidia/cuda/11.7.0-515.43.04
 source ~/.venv/dassl/bin/activate
+
+
+
 
 
 bash get_info.sh ssimagenet "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_ssimagenet.txt

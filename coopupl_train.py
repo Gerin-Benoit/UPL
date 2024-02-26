@@ -19,6 +19,10 @@ import datasets.sun397
 import datasets.caltech101
 import datasets.ucf101
 import datasets.imagenet
+import datasets.imagenet_a
+import datasets.imagenet_r
+import datasets.imagenet_sketch
+import datasets.imagenet_v2
 
 import trainers.upltrainer
 import trainers.hhzsclip
