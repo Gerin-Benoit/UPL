@@ -21,7 +21,6 @@ archs=("anay_rn101" "anay_ViT_B_32" "anay_ViT_L_14")
 
 index=$SLURM_ARRAY_TASK_ID
 arch_idx=$(( index ))
-
 arch=${archs[arch_idx]}
 
 module purge
@@ -30,5 +29,5 @@ module load devel/python/3.9.13
 source ~/.venv/dassl/bin/activate
 
 
-bash get_info.sh ssimagenet "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_"$dataset".txt
+bash get_info.sh ssimagenet "$arch" end 16 -1 False &> ~/pl_logs/"$arch"_ssimagenet.txt
 
