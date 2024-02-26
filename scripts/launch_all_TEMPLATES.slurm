@@ -31,5 +31,5 @@ module load devel/python/3.9.13
 module load nvidia/cuda/11.7.0-515.43.04
 source ~/.venv/dassl/bin/activate
 
-bash bash upl_train_TEMPLATES.sh "$dataset" "$arch" end 16 16 False True "$arch"_random_init > ~/zs_TEMPLATES/"$arch"_"$dataset".txt
+bash upl_train_TEMPLATES.sh "$dataset" "$arch" end 16 16 False True "$arch"_random_init > ~/zs_TEMPLATES/"$arch"_"$dataset".txt
 
