@@ -15,7 +15,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
 
-datasets=("ssimagenet")
+#datasets=("ssimagenet")
 archs=("anay_rn50" "anay_ViT_B_16")
 
 
