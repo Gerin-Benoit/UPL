@@ -9,14 +9,14 @@
 #SBATCH --mem=60G
 #SBATCH --gpus=1
 #SBATCH --time=4:00:00
-#SBATCH --array=0-2%3
+#SBATCH --array=0-1%2
 
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
 
 datasets=("ssimagenet")
-archs=("anay_rn101" "anay_ViT_B_32" "anay_ViT_L_14")
+archs=("rn50_ep50" "anay_ViT_B_16")
 
 
 index=$SLURM_ARRAY_TASK_ID
