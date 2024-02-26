@@ -16,7 +16,7 @@
 #SBATCH --account=ariacpg
 
 datasets=("ssimagenet")
-archs=("rn50_ep50" "anay_ViT_B_16")
+archs=("anay_rn50" "anay_ViT_B_16")
 
 
 index=$SLURM_ARRAY_TASK_ID
