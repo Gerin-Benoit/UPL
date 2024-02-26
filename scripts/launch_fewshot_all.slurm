@@ -14,7 +14,7 @@
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
-datasets=("sscaltech101" "ssdtd" "sseurosat" "ssfgvc_aircraft" "ssfood101" "ssoxford_flowers" "ssoxford_pets" "ssstanford_cars" "sssun397" "ssucf101") # "ssimagenet-a" "ssimagenet-r" "ssimagenet-sketch" "ssimagenet-v2" "ssimagenet")
+datasets=("ssimagenet") # "ssimagenet-a" "ssimagenet-r" "ssimagenet-sketch" "ssimagenet-v2" "ssimagenet")
 archs=("rn50_ep50" "anay_rn101" "anay_ViT_B_16" "anay_ViT_B_32" "anay_ViT_L_14")
 suffixes=("rn50" "rn101" "vit16" "vit32" "vitl14")
 shots=(1 2 4 8 16)

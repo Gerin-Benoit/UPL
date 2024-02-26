@@ -21,7 +21,7 @@ do
     DIR=./output_TEMPLATES/${DATASET}/${TRAINER}/${CFG}_${SHOTS}shots_EQULE_${CLASS_EQULE}_${CONF_THRESHOLD}_${TAG}/nctx${NCTX}_csc${CSC}_ctp${CTP}/seed${SEED}
 
     echo "Run this job and save the output to ${DIR}"
-    CUDA_VISIBLE_DEVICES=$SEED python upl_train_TEMPLATES.py \
+    python upl_train_TEMPLATES.py \
     --root ${DATA} \
     --seed ${SEED} \
     --trainer ${TRAINER} \
@@ -33,10 +33,9 @@ do
     TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
     DATASET.NUM_SHOTS ${SHOTS} \
     DATASET.NUM_TRUE_SHOTS -1 \
-    DATASET.CLASS_EQULE ${CLASS_EQULE} > ~/train_logs_TEMPLATES_${CFG}_${DATASET}_seed"$SEED".txt &
+    DATASET.CLASS_EQULE ${CLASS_EQULE} > ~/train_logs_TEMPLATES/${CFG}_${DATASET}_seed"$SEED".txt
 done
 
-wait
 
 
 # #!/bin/bash
