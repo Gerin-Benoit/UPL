@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=60G
 #SBATCH --gpus=1
-#SBATCH --time=20:00:00
+#SBATCH --time=1:23:00:00
 #SBATCH --array=0-59%60
 
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
