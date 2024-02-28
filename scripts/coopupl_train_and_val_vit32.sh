@@ -40,6 +40,7 @@ for (( i=0; i<$list_length; i++ )); do
     --n_shots ${SHOTS} \
     --lambda_s ${LAMBDA_S} \
     --lambda_q ${LAMBDA_Q} \
+    --dataset ${DATASET}\
     TRAINER.CoOpUPLTrainer.N_CTX ${NCTX} \
     TRAINER.CoOpUPLTrainer.CSC ${CSC} \
     TRAINER.CoOpUPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
