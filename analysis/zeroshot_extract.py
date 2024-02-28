@@ -8,7 +8,7 @@ output_file_path = 'CT_zeroshot_mean_accuracies.txt'
 
 # Regular expression to match the lines with accuracies and to parse filenames
 accuracy_pattern = re.compile(r'\* average: (\d+\.\d+)%')
-filename_pattern = re.compile(r'train_logs_(.*?)_(.*?).txt')
+filename_pattern = re.compile(r'anay_(.*?)_(.*?).txt')
 
 # Store mean accuracies and accumulative accuracies for computing mean of means
 mean_accuracies = defaultdict(list)
