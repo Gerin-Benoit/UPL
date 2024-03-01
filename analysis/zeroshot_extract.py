@@ -3,12 +3,12 @@ import re
 from collections import defaultdict
 
 # Adjust these paths as necessary
-folder_path = '/home/gerinb/logs/random_init'
-output_file_path = 'zeroshot_mean_accuracies.txt'
+folder_path = '/gpfs/home/acad/ucl-elen/gerinb/train_logs_TEMPLATES'
+output_file_path = 'CT_zeroshot_mean_accuracies.txt'
 
 # Regular expression to match the lines with accuracies and to parse filenames
 accuracy_pattern = re.compile(r'\* average: (\d+\.\d+)%')
-filename_pattern = re.compile(r'train_logs_(.*?)_(.*?).txt')
+filename_pattern = re.compile(r'anay_(.*?)_(.*?).txt')
 
 # Store mean accuracies and accumulative accuracies for computing mean of means
 mean_accuracies = defaultdict(list)

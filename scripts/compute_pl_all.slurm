@@ -9,14 +9,14 @@
 #SBATCH --mem=60G
 #SBATCH --gpus=1
 #SBATCH --time=4:00:00
-#SBATCH --array=0-1%2
+#SBATCH --array=0-4%5
 
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
 
 #datasets=("ssimagenet")
-archs=("anay_rn50" "anay_ViT_B_16")
+archs=("anay_rn50" "anay_ViT_B_16" "anay_rn101" "anay_ViT_B_32" "anay_ViT_L_14")
 
 
 index=$SLURM_ARRAY_TASK_ID
@@ -27,8 +27,6 @@ module purge
 module load devel/python/3.9.13
 module load nvidia/cuda/11.7.0-515.43.04
 source ~/.venv/dassl/bin/activate
-
-
 
 
 
