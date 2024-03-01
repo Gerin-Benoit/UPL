@@ -26,7 +26,7 @@ TRAIN:
   PRINT_FREQ: 5
 
 TEST:
-  Analyze_Result_Path: './analysis_results_test/'
+  Analyze_Result_Path: './temp_analyze_results_miltiple/analysis_results_test/'
   FINAL_MODEL: "last_val"
   PER_CLASS_RESULT: True
 
