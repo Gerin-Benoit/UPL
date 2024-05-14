@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=zs_32pl
 #SBATCH --output=/gpfs/home/acad/ucl-elen/gerinb/slurm/logs/%j_%x.out
-#SBATCH --partition=ia
+#SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
