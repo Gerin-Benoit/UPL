@@ -33,7 +33,7 @@ do
     TRAINER.UPLTrainer.CLASS_TOKEN_POSITION ${CTP} \
     DATASET.NUM_SHOTS ${SHOTS} \
     DATASET.NUM_TRUE_SHOTS -1 \
-    DATASET.CLASS_EQULE ${CLASS_EQULE} > ~/train_logs_32pl/${CFG}_${DATASET}_seed"$SEED".txt
+    DATASET.CLASS_EQULE ${CLASS_EQULE} > ~/train_logs_32pl/rn50${CFG}_${DATASET}_seed"$SEED".txt
 
 done
 

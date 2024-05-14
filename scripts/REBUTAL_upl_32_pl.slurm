@@ -20,5 +20,5 @@ module load devel/python/3.9.13
 module load nvidia/cuda/11.7.0-515.43.04
 source ~/.venv/dassl/bin/activate
 
-bash upl_train.sh ssimagenet anay_ViT_B_16 end 16 32 False True anay_ViT_B_32_random_init_32pl
+bash upl_train.sh ssimagenet anay_rn50 end 16 32 False True anay_rn50_random_init_32pl
 
