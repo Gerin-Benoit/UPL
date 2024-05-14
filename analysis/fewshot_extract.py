@@ -59,7 +59,7 @@ def compute_mean_accuracies(folder_path):
 output_file_path = 'fewshot_mean_accuracies_summary.txt'
 
 # Usage
-folder_path = '~/trainval_logs'
+folder_path = '/gpfs/home/acad/ucl-elen/gerinb/trainval_logs'
 mean_accuracies = compute_mean_accuracies(folder_path)
 
 # Sort mean_accuracies by arch, dataset, and n_shots for printing
