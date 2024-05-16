@@ -2,29 +2,29 @@
 
 #SBATCH --job-name=fs_imagenet
 #SBATCH --output=/gpfs/home/acad/ucl-elen/gerinb/slurm/logs/%j_%x.out
-#SBATCH --partition=gpu
+#SBATCH --partition=ia
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=60G
 #SBATCH --gpus=1
 #SBATCH --time=1-23:00:00
-#SBATCH --array=0-59%60
+#SBATCH --array=0-2%
 
 #SBATCH --mail-user=benoit.gerin@uclouvain.be
 #SBATCH --mail-type=ALL
 #SBATCH --account=ariacpg
 datasets=("ssimagenet") # "ssimagenet-a" "ssimagenet-r" "ssimagenet-sketch" "ssimagenet-v2" "ssimagenet")
-archs=("rn50_ep50" "anay_rn101" "anay_ViT_B_16" "anay_ViT_B_32" "anay_ViT_L_14")
-suffixes=("rn50" "rn101" "vit16" "vit32" "vitl14")
-shots=(1 2 4 8)
+archs=("anay_ViT_B_16")
+suffixes=("vit16")
+shots=(16)
 seeds=(1 2 3)
 
 index=$SLURM_ARRAY_TASK_ID
-dataset_idx=$(( index / 60 ))
-temp=$(( index % 60 ))
-arch_idx=$(( temp / 12 ))
-temp=$(( temp % 12 ))
+dataset_idx=$(( index / 3 ))
+temp=$(( index % 3 ))
+arch_idx=$(( temp / 3 ))
+temp=$(( temp % 3 ))
 shot_idx=$(( temp / 3 ))
 temp=$(( temp % 3 ))
 seed_idx=$(( temp ))
